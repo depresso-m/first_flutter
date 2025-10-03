@@ -7,71 +7,219 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Практика №3',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Информация о студенте'),
+      home: const MainScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+  final List<Widget> _screens = const [
+    HomeScreen(),
+    NameScreen(),
+    GroupScreen(),
+    NumberStudScreen(),
+    SpecialityScreen(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+      appBar: AppBar(title: const Text("Приложение")),
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index; // смена экрана
+          });
+        },
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Главная"),
+          BottomNavigationBarItem(icon: Icon(Icons.abc), label: "Имя"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.accessible_forward_outlined),
+            label: "Группа",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_chart),
+            label: "Номер студенческого",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.adb),
+            label: "Специальность",
+          ),
+        ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('ФИО студента', style: TextStyle(color: Colors.deepPurple, fontStyle: FontStyle.italic)),
-            SizedBox(height: 5),
-            Text(
-              'Черепов Михаил Борисович',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            SizedBox(height: 10),
-            Text('Номер группы', style: TextStyle(color: Colors.deepPurple, fontStyle: FontStyle.italic)),
-            SizedBox(height: 5),
-            Text(
-              'ИКБО-11-22',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            SizedBox(height: 10),
-            Text('Номер студенческого', style: TextStyle(color: Colors.deepPurple, fontStyle: FontStyle.italic)),
-            SizedBox(height: 5),
-            Text(
-              '22И1849',
-              style: Theme.of(context).textTheme.headlineMedium,
-            )
-          ],
-        ),
+    );
+  }
+}
+
+// Виджеты экранов
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "Добро пожаловать в тестовое приложение по третьей практике!",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 30),
+          Text(
+            "Здесь можно посмотреть информацию о студенте, выполнившем практику.",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, color: Colors.black54),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NameScreen extends StatelessWidget {
+  const NameScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "ФИО СТУДЕНТА",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "ЧЕРЕПОВ",
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+              SizedBox(width: 10),
+              Text(
+                "МИХАИЛ",
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+              SizedBox(width: 10),
+              Text(
+                "БОРИСОВИЧ",
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GroupScreen extends StatelessWidget {
+  const GroupScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "Группа в которой я учусь",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 15),
+          Text(
+            "ИКБО-11-22",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, color: Colors.green),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NumberStudScreen extends StatelessWidget {
+  const NumberStudScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "Номер моего студенческого",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 15),
+          Text(
+            "22И1849",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, color: Colors.cyan),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SpecialityScreen extends StatelessWidget {
+  const SpecialityScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "Моя специальность",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 15),
+          Text(
+            "ПРОГРАММНАЯ ИНЖЕНЕРИЯ",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, color: Colors.purple),
+          ),
+        ],
       ),
     );
   }
