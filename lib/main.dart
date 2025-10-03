@@ -61,7 +61,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add_chart),
-            label: "Номер студенческого",
+            label: "Номер студ.",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.adb),
