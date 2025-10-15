@@ -1,7 +1,11 @@
-import 'package:first_flutter/screens/medReceptionScreen.dart';
-import 'package:first_flutter/screens/medicineScreen.dart';
-import 'package:first_flutter/screens/stockScreen.dart';
+import 'package:first_flutter/screens/cartScreen.dart';
+import 'package:first_flutter/screens/medicinesScreen.dart';
+import 'package:first_flutter/screens/ordersScreen.dart';
 import 'package:flutter/material.dart';
+
+import 'models/cartItem.dart';
+import 'models/medicine.dart';
+import 'models/order.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,14 +17,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Практика №4',
+      title: 'Аптека',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MainScreen(),
+          primarySwatch: Colors.teal,
+          useMaterial3: true),
+      home: MainScreen(),
     );
   }
 }
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -30,48 +35,63 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
-  final List<Widget> _screens = const [
-    MedicineScreen(),
-    PharmacyStockScreen(),
-    MedicineReceptionScreen(),
+  int _selectedIndex = 0;
+  List<CartItem> cart = [];
+  List<Order> orders = [];
+
+  final List<Medicine> medicines = [
+    Medicine(name: 'Парацетамол', price: 120),
+    Medicine(name: 'Ибупрофен', price: 150),
+    Medicine(name: 'Аспирин', price: 90),
   ];
 
-  final List<String> _titles = [
-    "Каталог лекарств",
-    "Количество заказов",
-    "Приемка",
-  ];
+  void addToCart(Medicine med) {
+    setState(() {
+      final existing = cart.where((item) => item.medicine == med).toList();
+      if (existing.isNotEmpty) {
+        existing.first.quantity++;
+      } else {
+        cart.add(CartItem(medicine: med));
+      }
+    });
+  }
+
+  void makeOrder(String address) {
+    final total = cart.fold(
+        0.0, (sum, item) => sum + item.medicine.price * item.quantity);
+    setState(() {
+      orders.add(Order(items: List.from(cart),
+          total: total,
+          address: address,
+          date: DateTime.now()));
+      cart.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_titles[_currentIndex]),
-        centerTitle: true,
-        backgroundColor: Colors.blueAccent,
-        elevation: 4,
-      ),
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.view_list),
-            label: "Каталог",
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.warehouse), label: "Склад"),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: "Приемка"),
-        ],
+    final screens = [
+      MedicinesScreen(medicines: medicines, onAdd: addToCart),
+      CartScreen(cart: cart, onOrder: makeOrder),
+      OrdersScreen(orders: orders),
+    ];
+
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: Text('Аптека')),
+        body: screens[_selectedIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (i) => setState(() => _selectedIndex = i),
+          items: const [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.local_pharmacy), label: 'Лекарства'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.shopping_cart), label: 'Корзина'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.list_alt), label: 'Заказы'),
+          ],
+        ),
       ),
     );
   }
