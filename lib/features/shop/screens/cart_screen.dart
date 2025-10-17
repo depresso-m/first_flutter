@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../shared/widgets/empty_placeholder.dart';
 import '../models/cart_item.dart';
-import '../widget/quantity_controls.dart';
+import '../widgets/quantity_controls.dart';
 
 class CartScreen extends StatefulWidget {
   final List<CartItem> cart;

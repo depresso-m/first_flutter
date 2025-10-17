@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../shared/widgets/empty_placeholder.dart';
 import '../models/order.dart';
 import '../state/order_state.dart';
-import '../widget/status_chip.dart';
+import '../widgets/status_chip.dart';
 
 class OrdersScreen extends StatefulWidget {
   final List<Order> orders;
