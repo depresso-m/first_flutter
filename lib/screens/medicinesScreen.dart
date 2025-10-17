@@ -13,34 +13,68 @@ class MedicinesScreen extends StatefulWidget {
 
 class _MedicinesScreenState extends State<MedicinesScreen> {
   bool sortByPrice = false;
+  String searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
     final meds = [...widget.medicines];
     if (sortByPrice) meds.sort((a, b) => a.price.compareTo(b.price));
+    final filtered = searchQuery.isEmpty
+        ? meds
+        : meds.where((m) => m.name.toLowerCase().contains(searchQuery.toLowerCase())).toList();
 
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            TextButton(
-              onPressed: () => setState(() => sortByPrice = !sortByPrice),
-              child: Text(sortByPrice ? 'По названию' : 'По цене'),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            children: [
+              Text('Каталог', style: Theme.of(context).textTheme.titleMedium),
+              Spacer(),
+              FilledButton.tonal(
+                onPressed: () => setState(() => sortByPrice = !sortByPrice),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(sortByPrice ? Icons.sort_by_alpha : Icons.attach_money),
+                    SizedBox(width: 6),
+                    Text(sortByPrice ? 'По названию' : 'По цене'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: TextField(
+            onChanged: (value) => setState(() => searchQuery = value),
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.search),
+              hintText: 'Поиск по названию',
+              border: OutlineInputBorder(),
+              isDense: true,
             ),
-          ],
+          ),
         ),
         Expanded(
-          child: ListView.builder(
-            itemCount: meds.length,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            separatorBuilder: (_, __) => SizedBox(height: 8),
+            itemCount: filtered.length,
             itemBuilder: (_, i) {
-              final med = meds[i];
-              return ListTile(
-                title: Text(med.name),
-                subtitle: Text('${med.price} ₽'),
-                trailing: IconButton(
-                  icon: Icon(Icons.add_shopping_cart),
-                  onPressed: () => widget.onAdd(med),
+              final med = filtered[i];
+              return Card(
+                clipBehavior: Clip.antiAlias,
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  title: Text(med.name, style: Theme.of(context).textTheme.titleMedium),
+                  subtitle: Text('${med.price.toStringAsFixed(2)} ₽'),
+                  trailing: FilledButton.icon(
+                    onPressed: () => widget.onAdd(med),
+                    icon: Icon(Icons.add_shopping_cart),
+                    label: Text('В корзину'),
+                  ),
                 ),
               );
             },
