@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/widgets/empty_placeholder.dart';
 import '../models/order.dart';
+import '../state/order_state.dart';
+import '../widget/status_chip.dart';
 
 class OrdersScreen extends StatefulWidget {
   final List<Order> orders;
+
   const OrdersScreen({super.key, required this.orders});
 
   @override
@@ -34,7 +38,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     final orders = widget.orders;
-    if (orders.isEmpty) return Center(child: Text('Заказов пока нет'));
+    if (orders.isEmpty) {
+      return EmptyPlaceholder(
+        icon: Icons.receipt_long,
+        message: 'Заказов пока нет',
+      );
+    }
 
     return ListView.separated(
       padding: const EdgeInsets.all(12),
@@ -43,34 +52,45 @@ class _OrdersScreenState extends State<OrdersScreen> {
       itemBuilder: (_, i) {
         final order = orders[i];
         final dateStr = order.date.toLocal().toString().split(' ')[0];
-        final status = order.getStatusAt(_now);
-        final progress = order.getProgressAt(_now);
+        final status = getOrderStatusAt(order, _now);
 
         return Card(
           elevation: 1,
           child: ExpansionTile(
-            tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            tilePadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             title: Row(
               children: [
                 Expanded(
-                  child: Text('Заказ от $dateStr', style: Theme.of(context).textTheme.titleMedium),
+                  child: Text(
+                    'Заказ от $dateStr',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
-                _StatusChip(status: status),
+                StatusChip(status: status),
               ],
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Адрес: ${order.address}')
-              ],
+              children: [Text('Адрес: ${order.address}')],
             ),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('${order.total.toStringAsFixed(2)} ₽', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                Text(
+                  '${order.total.toStringAsFixed(2)} ₽',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                ),
                 SizedBox(height: 2),
-                Text('${order.items.length} поз.', style: Theme.of(context).textTheme.bodySmall),
+                Text(
+                  '${order.items.length} поз.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               ],
             ),
             children: [
@@ -85,7 +105,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   return ListTile(
                     dense: true,
                     title: Text(item.medicine.name),
-                    subtitle: Text('${item.medicine.price.toStringAsFixed(2)} ₽ x ${item.quantity}'),
+                    subtitle: Text(
+                      '${item.medicine.price.toStringAsFixed(2)} ₽ x ${item.quantity}',
+                    ),
                     trailing: Text('${lineTotal.toStringAsFixed(2)} ₽'),
                   );
                 },
@@ -95,30 +117,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
           ),
         );
       },
-    );
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  final OrderStatus status;
-  const _StatusChip({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    final (label, color) = switch (status) {
-      OrderStatus.received => ('Заказ получен', Colors.blue),
-      OrderStatus.formed => ('Заказ сформирован', Colors.orange),
-      OrderStatus.assembled => ('Заказ собран', Colors.green),
-      OrderStatus.handed => ('Передан в доставку', Colors.purple),
-    };
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.4)),
-      ),
-      child: Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
     );
   }
 }

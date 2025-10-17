@@ -5,10 +5,15 @@ import '../models/medicine.dart';
 class MedicinesScreen extends StatefulWidget {
   final List<Medicine> medicines;
   final Function(Medicine) onAdd;
-  const MedicinesScreen({required this.medicines, required this.onAdd});
+
+  const MedicinesScreen({
+    super.key,
+    required this.medicines,
+    required this.onAdd,
+  });
 
   @override
-  _MedicinesScreenState createState() => _MedicinesScreenState();
+  State<MedicinesScreen> createState() => _MedicinesScreenState();
 }
 
 class _MedicinesScreenState extends State<MedicinesScreen> {
@@ -21,7 +26,11 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
     if (sortByPrice) meds.sort((a, b) => a.price.compareTo(b.price));
     final filtered = searchQuery.isEmpty
         ? meds
-        : meds.where((m) => m.name.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+        : meds
+              .where(
+                (m) => m.name.toLowerCase().contains(searchQuery.toLowerCase()),
+              )
+              .toList();
 
     return Column(
       children: [
@@ -36,7 +45,9 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(sortByPrice ? Icons.sort_by_alpha : Icons.attach_money),
+                    Icon(
+                      sortByPrice ? Icons.sort_by_alpha : Icons.attach_money,
+                    ),
                     SizedBox(width: 6),
                     Text(sortByPrice ? 'По названию' : 'По цене'),
                   ],
@@ -67,8 +78,14 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
               return Card(
                 clipBehavior: Clip.antiAlias,
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  title: Text(med.name, style: Theme.of(context).textTheme.titleMedium),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  title: Text(
+                    med.name,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   subtitle: Text('${med.price.toStringAsFixed(2)} ₽'),
                   trailing: FilledButton.icon(
                     onPressed: () => widget.onAdd(med),
