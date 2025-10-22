@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/medicine.dart';
+import '../widgets/medicine_tile.dart';
 
 class MedicinesScreen extends StatefulWidget {
   final List<Medicine> medicines;
@@ -75,24 +76,9 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
             itemCount: filtered.length,
             itemBuilder: (_, i) {
               final med = filtered[i];
-              return Card(
-                clipBehavior: Clip.antiAlias,
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  title: Text(
-                    med.name,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  subtitle: Text('${med.price.toStringAsFixed(2)} ₽'),
-                  trailing: FilledButton.icon(
-                    onPressed: () => widget.onAdd(med),
-                    icon: Icon(Icons.add_shopping_cart),
-                    label: Text('В корзину'),
-                  ),
-                ),
+              return MedicineTile(
+                medicine: med,
+                onAdd: () => widget.onAdd(med),
               );
             },
           ),

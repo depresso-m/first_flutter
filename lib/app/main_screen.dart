@@ -1,3 +1,4 @@
+import 'package:first_flutter/features/shop/screens/image_screen.dart';
 import 'package:flutter/material.dart';
 
 
@@ -21,9 +22,9 @@ class _MainScreenState extends State<MainScreen> {
   List<Order> orders = [];
 
   final List<Medicine> medicines = [
-    Medicine(name: 'Парацетамол', price: 120),
-    Medicine(name: 'Ибупрофен', price: 150),
-    Medicine(name: 'Аспирин', price: 90),
+    Medicine(name: 'Парацетамол', price: 120, imageUrl: "https://cdn.eapteka.ru/upload/offer_photo/234/898/1_7e5109f0fb5a68c6dc68fd151df84d1a.png?t=1634213074&_cvc=1760108554"),
+    Medicine(name: 'Ибупрофен', price: 150, imageUrl: "https://ozerki.ru/_next/image/?url=https%3A%2F%2Fozerki.ru%2Fer-pics%2Fimages%2Fgoods%2F77719%2Fmain&w=768&q=90"),
+    Medicine(name: 'Аспирин', price: 90, imageUrl: "https://evropharm.ru/Storage/Resized/w_480/aspirin-bajer-0-5-n20.jpg"),
   ];
 
   void addToCart(Medicine med) {
@@ -51,6 +52,7 @@ class _MainScreenState extends State<MainScreen> {
       MedicinesScreen(medicines: medicines, onAdd: addToCart),
       CartScreen(cart: cart, onOrder: makeOrder),
       OrdersScreen(orders: orders),
+      ImageScreen()
     ];
 
     return Scaffold(
@@ -63,6 +65,7 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.local_pharmacy), label: 'Лекарства'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Корзина'),
           BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Заказы'),
+          BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Кот')
         ],
       ),
     );
