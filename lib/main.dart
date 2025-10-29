@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'app/main_screen.dart';
+import 'features/shop/screens/favourites_screen.dart';
+import 'features/shop/screens/orders_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'features/shop/models/cart_item.dart';
 import 'features/shop/models/medicine.dart';
 import 'features/shop/models/order.dart';
@@ -94,36 +97,68 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _buildMainScreen(BuildContext context, int index) {
-    return Builder(
-      builder: (builderContext) => MainScreen(
-        initialIndex: index,
-        medicines: medicines,
-        cart: cart,
-        orders: orders,
-        favourites: favourites,
-        onAddToCart: addToCart,
-        onMakeOrder: makeOrder,
-        onToggleFavourite: toggleFavourite,
-        onTabChange: (newIndex) {
-          Navigator.of(builderContext).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => _buildMainScreen(builderContext, newIndex),
-            ),
-          );
-        },
-      ),
+    return MainScreen(
+      initialIndex: index,
+      medicines: medicines,
+      cart: cart,
+      orders: orders,
+      favourites: favourites,
+      onAddToCart: addToCart,
+      onMakeOrder: makeOrder,
+      onToggleFavourite: toggleFavourite,
+      onTabChange: (newIndex) {
+        final path = newIndex == 0 ? '/' : newIndex == 1 ? '/cart' : '/profile';
+        GoRouter.of(context).go(path);
+      },
+      onOpenOrders: () => GoRouter.of(context).push('/orders'),
+      onOpenFavourites: () => GoRouter.of(context).push('/favourites'),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => _buildMainScreen(context, 0),
+        ),
+        GoRoute(
+          path: '/cart',
+          builder: (context, state) => _buildMainScreen(context, 1),
+        ),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => _buildMainScreen(context, 2),
+        ),
+        GoRoute(
+          path: '/orders',
+          builder: (context, state) => Scaffold(
+            appBar: AppBar(automaticallyImplyLeading: false),
+            body: OrdersScreen(orders: orders),
+          ),
+        ),
+        GoRoute(
+          path: '/favourites',
+          builder: (context, state) => Scaffold(
+            appBar: AppBar(automaticallyImplyLeading: false),
+            body: FavouritesScreen(
+              favourites: favourites,
+              onToggleFavourite: toggleFavourite,
+              onAdd: addToCart,
+            ),
+          ),
+        ),
+      ],
+    );
+
+    return MaterialApp.router(
       title: 'Аптека',
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: Builder(builder: (context) => _buildMainScreen(context, 0)),
+      routerConfig: router,
     );
   }
 }

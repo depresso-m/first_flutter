@@ -4,9 +4,7 @@ import '../features/shop/models/cart_item.dart';
 import '../features/shop/models/medicine.dart';
 import '../features/shop/models/order.dart';
 import '../features/shop/screens/cart_screen.dart';
-import '../features/shop/screens/favourites_screen.dart';
 import '../features/shop/screens/medicines_screen.dart';
-import '../features/shop/screens/orders_screen.dart';
 import '../features/shop/screens/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -19,6 +17,8 @@ class MainScreen extends StatefulWidget {
   final void Function(String) onMakeOrder;
   final void Function(Medicine) onToggleFavourite;
   final void Function(int)? onTabChange;
+  final VoidCallback? onOpenOrders;
+  final VoidCallback? onOpenFavourites;
 
   const MainScreen({
     super.key,
@@ -31,6 +31,8 @@ class MainScreen extends StatefulWidget {
     required this.onMakeOrder,
     required this.onToggleFavourite,
     this.onTabChange,
+    this.onOpenOrders,
+    this.onOpenFavourites,
   });
 
   @override
@@ -49,24 +51,8 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final profileBody = ProfileScreen(
-      buildOrdersPage: () => Scaffold(
-        appBar: AppBar(
-          title: Text('История покупок'),
-          automaticallyImplyLeading: false,
-        ),
-        body: OrdersScreen(orders: widget.orders),
-      ),
-      buildFavouritesPage: () => Scaffold(
-        appBar: AppBar(
-          title: Text('Избранное'),
-          automaticallyImplyLeading: false,
-        ),
-        body: FavouritesScreen(
-          favourites: widget.favourites,
-          onToggleFavourite: widget.onToggleFavourite,
-          onAdd: widget.onAddToCart,
-        ),
-      ),
+      onOpenOrders: () => widget.onOpenOrders?.call(),
+      onOpenFavourites: () => widget.onOpenFavourites?.call(),
     );
 
     final screens = [

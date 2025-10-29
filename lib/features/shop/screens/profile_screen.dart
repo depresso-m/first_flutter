@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
-  final Widget Function() buildOrdersPage;
-  final Widget Function() buildFavouritesPage;
+  final VoidCallback onOpenOrders;
+  final VoidCallback onOpenFavourites;
 
   const ProfileScreen({
     super.key,
-    required this.buildOrdersPage,
-    required this.buildFavouritesPage,
+    required this.onOpenOrders,
+    required this.onOpenFavourites,
   });
 
   @override
@@ -45,11 +45,7 @@ class ProfileScreen extends StatelessWidget {
               leading: Icon(Icons.receipt_long),
               title: Text('История покупок'),
               trailing: Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (_) => buildOrdersPage()));
-              },
+              onTap: onOpenOrders,
             ),
           ),
           SizedBox(height: 12),
@@ -58,11 +54,7 @@ class ProfileScreen extends StatelessWidget {
               leading: Icon(Icons.favorite),
               title: Text('Избранное'),
               trailing: Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => buildFavouritesPage()),
-                );
-              },
+              onTap: onOpenFavourites,
             ),
           ),
         ],
