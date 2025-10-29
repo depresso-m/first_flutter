@@ -6,11 +6,15 @@ import '../widgets/medicine_tile.dart';
 class MedicinesScreen extends StatefulWidget {
   final List<Medicine> medicines;
   final Function(Medicine) onAdd;
+  final Set<Medicine> favourites;
+  final Function(Medicine) onToggleFavourite;
 
   const MedicinesScreen({
     super.key,
     required this.medicines,
     required this.onAdd,
+    required this.favourites,
+    required this.onToggleFavourite,
   });
 
   @override
@@ -79,6 +83,8 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
               return MedicineTile(
                 medicine: med,
                 onAdd: () => widget.onAdd(med),
+                isFavourite: widget.favourites.contains(med),
+                onToggleFavourite: () => widget.onToggleFavourite(med),
               );
             },
           ),

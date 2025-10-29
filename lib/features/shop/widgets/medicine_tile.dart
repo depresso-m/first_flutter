@@ -6,8 +6,10 @@ import '../models/medicine.dart';
 class MedicineTile extends StatelessWidget {
   final Medicine medicine;
   final VoidCallback onAdd;
+  final bool isFavourite;
+  final VoidCallback onToggleFavourite;
 
-  const MedicineTile({super.key, required this.medicine, required this.onAdd});
+  const MedicineTile({super.key, required this.medicine, required this.onAdd, required this.isFavourite, required this.onToggleFavourite});
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +23,21 @@ class MedicineTile extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         subtitle: Text('${medicine.price.toStringAsFixed(2)} ₽'),
-        trailing: FilledButton.icon(
-          onPressed: onAdd,
-          icon: Icon(Icons.add_shopping_cart),
-          label: Text('В корзину'),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              onPressed: onToggleFavourite,
+              icon: Icon(isFavourite ? Icons.favorite : Icons.favorite_border),
+              color: isFavourite ? Colors.red : null,
+              tooltip: isFavourite ? 'Убрать из избранного' : 'В избранное',
+            ),
+            FilledButton.icon(
+              onPressed: onAdd,
+              icon: Icon(Icons.add_shopping_cart),
+              label: Text('В корзину'),
+            ),
+          ],
         ),
       ),
     );
