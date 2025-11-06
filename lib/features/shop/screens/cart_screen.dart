@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import '../../../shared/widgets/empty_placeholder.dart';
 import '../models/cart_item.dart';
 import '../widgets/quantity_controls.dart';
+import 'checkout_screen.dart';
 
 class CartScreen extends StatefulWidget {
   final List<CartItem> cart;
-  final Function(String) onOrder;
+  final Function(String, String, String, String) onOrder;
 
   const CartScreen({super.key, required this.cart, required this.onOrder});
 
@@ -121,37 +122,15 @@ class _CartScreenState extends State<CartScreen> {
                 onPressed: widget.cart.isEmpty
                     ? null
                     : () {
-                        showDialog(
-                          context: context,
-                          builder: (dialogContext) {
-                            final controller = TextEditingController();
-                            return AlertDialog(
-                              title: Text('Адрес доставки'),
-                              content: TextField(
-                                controller: controller,
-                                decoration: InputDecoration(
-                                  hintText: 'Введите адрес',
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(dialogContext),
-                                  child: Text('Отмена'),
-                                ),
-                                FilledButton(
-                                  onPressed: () {
-                                    final address = controller.text.trim();
-                                    Navigator.pop(dialogContext);
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                          widget.onOrder(address);
-                                        });
-                                  },
-                                  child: Text('Подтвердить'),
-                                ),
-                              ],
-                            );
-                          },
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CheckoutScreen(
+                              cart: widget.cart,
+                              total: total,
+                              onOrder: widget.onOrder,
+                            ),
+                          ),
                         );
                       },
                 icon: Icon(Icons.payment),

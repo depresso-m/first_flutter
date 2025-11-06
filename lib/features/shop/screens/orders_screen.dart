@@ -4,6 +4,7 @@ import '../../../shared/widgets/empty_placeholder.dart';
 import '../models/order.dart';
 import '../state/order_state.dart';
 import '../widgets/status_chip.dart';
+import '../widgets/back_button.dart';
 
 class OrdersScreen extends StatefulWidget {
   final List<Order> orders;
@@ -38,14 +39,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     final orders = widget.orders;
-    if (orders.isEmpty) {
-      return EmptyPlaceholder(
-        icon: Icons.receipt_long,
-        message: 'Заказов пока нет',
-      );
-    }
-
-    return ListView.separated(
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('История покупок'),
+        leading: CustomBackButton(),
+      ),
+      body: orders.isEmpty
+          ? EmptyPlaceholder(
+              icon: Icons.receipt_long,
+              message: 'Заказов пока нет',
+            )
+          : ListView.separated(
       padding: const EdgeInsets.all(12),
       separatorBuilder: (_, __) => SizedBox(height: 8),
       itemCount: orders.length,
@@ -117,6 +122,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           ),
         );
       },
+    ),
     );
   }
 }

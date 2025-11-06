@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../shared/widgets/empty_placeholder.dart';
 import '../models/medicine.dart';
 import '../widgets/medicine_tile.dart';
+import '../widgets/back_button.dart';
 
 class FavouritesScreen extends StatelessWidget {
   final Set<Medicine> favourites;
@@ -13,15 +14,20 @@ class FavouritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (favourites.isEmpty) {
-      return EmptyPlaceholder(
-        icon: Icons.favorite_border,
-        message: 'Избранных товаров нет',
-      );
-    }
-
-    final favList = favourites.toList();
-    return ListView.separated(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Избранное'),
+        leading: CustomBackButton(),
+      ),
+      body: favourites.isEmpty
+          ? EmptyPlaceholder(
+              icon: Icons.favorite_border,
+              message: 'Избранных товаров нет',
+            )
+          : Builder(
+              builder: (context) {
+                final favList = favourites.toList();
+                return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       separatorBuilder: (_, __) => SizedBox(height: 8),
       itemCount: favList.length,
@@ -34,6 +40,9 @@ class FavouritesScreen extends StatelessWidget {
           onToggleFavourite: () => onToggleFavourite(med),
         );
       },
+    );
+              },
+            ),
     );
   }
 }

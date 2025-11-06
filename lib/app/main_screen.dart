@@ -4,12 +4,8 @@ import '../features/shop/models/cart_item.dart';
 import '../features/shop/models/medicine.dart';
 import '../features/shop/models/order.dart';
 import '../features/shop/screens/cart_screen.dart';
-import '../features/shop/screens/favourites_screen.dart';
 import '../features/shop/screens/medicines_screen.dart';
-import '../features/shop/screens/orders_screen.dart';
 import '../features/shop/screens/profile_screen.dart';
-
-enum ProfileSubpage { none, orders, favourites }
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -23,8 +19,6 @@ class _MainScreenState extends State<MainScreen> {
   List<CartItem> cart = [];
   List<Order> orders = [];
   final Set<Medicine> favourites = {};
-
-  ProfileSubpage _profileSubpage = ProfileSubpage.none;
 
   final List<Medicine> medicines = [
     Medicine(
@@ -70,7 +64,7 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  void makeOrder(String address) {
+  void makeOrder(String fullName, String email, String phone, String address) {
     final total = cart.fold(
       0.0,
       (sum, item) => sum + item.medicine.price * item.quantity,
@@ -100,24 +94,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget profileBody;
-    if (_profileSubpage == ProfileSubpage.none) {
-      profileBody = ProfileScreen(
-        onShowOrders: () =>
-            setState(() => _profileSubpage = ProfileSubpage.orders),
-        onShowFavourites: () =>
-            setState(() => _profileSubpage = ProfileSubpage.favourites),
-      );
-    } else if (_profileSubpage == ProfileSubpage.orders) {
-      profileBody = OrdersScreen(orders: orders);
-    } else {
-      profileBody = FavouritesScreen(
-        favourites: favourites,
-        onToggleFavourite: toggleFavourite,
-        onAdd: addToCart,
-      );
-    }
-
     final screens = [
       MedicinesScreen(
         medicines: medicines,
@@ -126,45 +102,32 @@ class _MainScreenState extends State<MainScreen> {
         onToggleFavourite: toggleFavourite,
       ),
       CartScreen(cart: cart, onOrder: makeOrder),
-      profileBody,
+      ProfileScreen(
+        orders: orders,
+        favourites: favourites,
+        onToggleFavourite: toggleFavourite,
+        onAdd: addToCart,
+      ),
     ];
 
-    final bool showBackInProfile =
-        _selectedIndex == 2 && _profileSubpage != ProfileSubpage.none;
     String appBarTitle;
     if (_selectedIndex == 0) {
       appBarTitle = 'Аптека';
     } else if (_selectedIndex == 1) {
       appBarTitle = 'Корзина';
     } else {
-      if (_profileSubpage == ProfileSubpage.none) {
-        appBarTitle = 'Профиль';
-      } else if (_profileSubpage == ProfileSubpage.orders) {
-        appBarTitle = 'История покупок';
-      } else {
-        appBarTitle = 'Избранное';
-      }
+      appBarTitle = 'Профиль';
     }
 
     return Scaffold(
       appBar: AppBar(
         title: Text(appBarTitle),
-        leading: showBackInProfile
-            ? IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () =>
-                    setState(() => _profileSubpage = ProfileSubpage.none),
-              )
-            : null,
       ),
       body: screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (i) => setState(() {
           _selectedIndex = i;
-          if (_selectedIndex != 2) {
-            _profileSubpage = ProfileSubpage.none;
-          }
         }),
         items: const [
           BottomNavigationBarItem(
