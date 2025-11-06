@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'app/main_screen.dart';
-import 'features/shop/screens/favourites_screen.dart';
-import 'features/shop/screens/orders_screen.dart';
-import 'package:go_router/go_router.dart';
 import 'features/shop/models/cart_item.dart';
 import 'features/shop/models/medicine.dart';
 import 'features/shop/models/order.dart';
+import 'features/shop/screens/checkout_screen.dart';
+import 'features/shop/screens/favourites_screen.dart';
+import 'features/shop/screens/order_success_screen.dart';
+import 'features/shop/screens/orders_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,6 +25,7 @@ class _MyAppState extends State<MyApp> {
   List<CartItem> cart = [];
   List<Order> orders = [];
   final Set<Medicine> favourites = {};
+  final ValueNotifier<int> _refreshNotifier = ValueNotifier<int>(0);
 
   final List<Medicine> medicines = [
     Medicine(
@@ -65,10 +68,11 @@ class _MyAppState extends State<MyApp> {
       } else {
         cart.add(CartItem(medicine: med));
       }
+      _refreshNotifier.value++;
     });
   }
 
-  void makeOrder(String address) {
+  void makeOrder(String fullName, String email, String phone, String address) {
     final total = cart.fold(
       0.0,
       (sum, item) => sum + item.medicine.price * item.quantity,
@@ -83,6 +87,7 @@ class _MyAppState extends State<MyApp> {
         ),
       );
       cart.clear();
+      _refreshNotifier.value++;
     });
   }
 
@@ -93,72 +98,67 @@ class _MyAppState extends State<MyApp> {
       } else {
         favourites.add(med);
       }
+      _refreshNotifier.value++;
     });
   }
 
-  Widget _buildMainScreen(BuildContext context, int index) {
-    return MainScreen(
-      initialIndex: index,
-      medicines: medicines,
-      cart: cart,
-      orders: orders,
-      favourites: favourites,
-      onAddToCart: addToCart,
-      onMakeOrder: makeOrder,
-      onToggleFavourite: toggleFavourite,
-      onTabChange: (newIndex) {
-        final path = newIndex == 0 ? '/' : newIndex == 1 ? '/cart' : '/profile';
-        GoRouter.of(context).go(path);
-      },
-      onOpenOrders: () => GoRouter.of(context).push('/orders'),
-      onOpenFavourites: () => GoRouter.of(context).push('/favourites'),
-    );
-  }
+  late final GoRouter _router = GoRouter(
+    refreshListenable: _refreshNotifier,
+    initialLocation: '/',
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => MainScreen(
+          cart: cart,
+          orders: orders,
+          favourites: favourites,
+          medicines: medicines,
+          onAddToCart: addToCart,
+          onMakeOrder: makeOrder,
+          onToggleFavourite: toggleFavourite,
+        ),
+      ),
+      GoRoute(
+        path: '/orders',
+        builder: (context, state) => OrdersScreen(orders: orders),
+      ),
+      GoRoute(
+        path: '/favourites',
+        builder: (context, state) => FavouritesScreen(
+          favourites: favourites,
+          onToggleFavourite: toggleFavourite,
+          onAdd: addToCart,
+        ),
+      ),
+      GoRoute(
+        path: '/checkout',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final cartItems = extra?['cart'] as List<CartItem>? ?? [];
+          final total = extra?['total'] as double? ?? 0.0;
+          return CheckoutScreen(
+            cart: cartItems,
+            total: total,
+            onOrder: makeOrder,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/order-success',
+        builder: (context, state) => const OrderSuccessScreen(),
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
-    final router = GoRouter(
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => _buildMainScreen(context, 0),
-        ),
-        GoRoute(
-          path: '/cart',
-          builder: (context, state) => _buildMainScreen(context, 1),
-        ),
-        GoRoute(
-          path: '/profile',
-          builder: (context, state) => _buildMainScreen(context, 2),
-        ),
-        GoRoute(
-          path: '/orders',
-          builder: (context, state) => Scaffold(
-            appBar: AppBar(automaticallyImplyLeading: false),
-            body: OrdersScreen(orders: orders),
-          ),
-        ),
-        GoRoute(
-          path: '/favourites',
-          builder: (context, state) => Scaffold(
-            appBar: AppBar(automaticallyImplyLeading: false),
-            body: FavouritesScreen(
-              favourites: favourites,
-              onToggleFavourite: toggleFavourite,
-              onAdd: addToCart,
-            ),
-          ),
-        ),
-      ],
-    );
-
     return MaterialApp.router(
       title: 'Аптека',
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
       ),
-      routerConfig: router,
+      routerConfig: _router,
     );
   }
 }

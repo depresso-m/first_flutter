@@ -8,7 +8,24 @@ import '../features/shop/screens/medicines_screen.dart';
 import '../features/shop/screens/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final List<CartItem> cart;
+  final List<Order> orders;
+  final Set<Medicine> favourites;
+  final List<Medicine> medicines;
+  final Function(Medicine) onAddToCart;
+  final Function(String, String, String, String) onMakeOrder;
+  final Function(Medicine) onToggleFavourite;
+
+  const MainScreen({
+    super.key,
+    required this.cart,
+    required this.orders,
+    required this.favourites,
+    required this.medicines,
+    required this.onAddToCart,
+    required this.onMakeOrder,
+    required this.onToggleFavourite,
+  });
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -16,79 +33,10 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  List<CartItem> cart = [];
-  List<Order> orders = [];
-  final Set<Medicine> favourites = {};
 
-  final List<Medicine> medicines = [
-    Medicine(
-      name: 'Парацетамол',
-      price: 120,
-      imageUrl:
-          "https://cdn.eapteka.ru/upload/offer_photo/234/898/1_7e5109f0fb5a68c6dc68fd151df84d1a.png?t=1634213074&_cvc=1760108554",
-    ),
-    Medicine(
-      name: 'Ибупрофен',
-      price: 150,
-      imageUrl:
-          "https://ozerki.ru/_next/image/?url=https%3A%2F%2Fozerki.ru%2Fer-pics%2Fimages%2Fgoods%2F77719%2Fmain&w=768&q=90",
-    ),
-    Medicine(
-      name: 'Аспирин',
-      price: 90,
-      imageUrl:
-          "https://evropharm.ru/Storage/Resized/w_480/aspirin-bajer-0-5-n20.jpg",
-    ),
-    Medicine(
-      name: 'Азитромицин',
-      price: 70,
-      imageUrl:
-          "https://evropharm.ru/Storage/azitromicin-500-mg-N3-tabl-verteks.jpg",
-    ),
-    Medicine(
-      name: 'Черника Форте',
-      price: 90,
-      imageUrl:
-          "https://cdn.eapteka.ru/upload/offer_photo/209/604/resized/450_450_1_2a2eb8f6df8c079a54c210b8ae3db676.png?t=1727348871&_cvc=1760730070",
-    ),
-  ];
-
-  void addToCart(Medicine med) {
+  void _onTabTapped(int index) {
     setState(() {
-      final existing = cart.where((item) => item.medicine == med).toList();
-      if (existing.isNotEmpty) {
-        existing.first.quantity++;
-      } else {
-        cart.add(CartItem(medicine: med));
-      }
-    });
-  }
-
-  void makeOrder(String fullName, String email, String phone, String address) {
-    final total = cart.fold(
-      0.0,
-      (sum, item) => sum + item.medicine.price * item.quantity,
-    );
-    setState(() {
-      orders.add(
-        Order(
-          items: List.from(cart),
-          total: total,
-          address: address,
-          date: DateTime.now(),
-        ),
-      );
-      cart.clear();
-    });
-  }
-
-  void toggleFavourite(Medicine med) {
-    setState(() {
-      if (favourites.contains(med)) {
-        favourites.remove(med);
-      } else {
-        favourites.add(med);
-      }
+      _selectedIndex = index;
     });
   }
 
@@ -96,17 +44,17 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final screens = [
       MedicinesScreen(
-        medicines: medicines,
-        onAdd: addToCart,
-        favourites: favourites,
-        onToggleFavourite: toggleFavourite,
+        medicines: widget.medicines,
+        onAdd: widget.onAddToCart,
+        favourites: widget.favourites,
+        onToggleFavourite: widget.onToggleFavourite,
       ),
-      CartScreen(cart: cart, onOrder: makeOrder),
+      CartScreen(cart: widget.cart, onOrder: widget.onMakeOrder),
       ProfileScreen(
-        orders: orders,
-        favourites: favourites,
-        onToggleFavourite: toggleFavourite,
-        onAdd: addToCart,
+        orders: widget.orders,
+        favourites: widget.favourites,
+        onToggleFavourite: widget.onToggleFavourite,
+        onAdd: widget.onAddToCart,
       ),
     ];
 
@@ -126,9 +74,7 @@ class _MainScreenState extends State<MainScreen> {
       body: screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: (i) => setState(() {
-          _selectedIndex = i;
-        }),
+        onTap: _onTabTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.local_pharmacy),

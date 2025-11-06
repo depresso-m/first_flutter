@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../shared/widgets/empty_placeholder.dart';
 import '../models/cart_item.dart';
 import '../widgets/quantity_controls.dart';
-import 'checkout_screen.dart';
 
 class CartScreen extends StatefulWidget {
   final List<CartItem> cart;
@@ -122,15 +122,12 @@ class _CartScreenState extends State<CartScreen> {
                 onPressed: widget.cart.isEmpty
                     ? null
                     : () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CheckoutScreen(
-                              cart: widget.cart,
-                              total: total,
-                              onOrder: widget.onOrder,
-                            ),
-                          ),
+                        context.push(
+                          '/checkout',
+                          extra: {
+                            'cart': widget.cart,
+                            'total': total,
+                          },
                         );
                       },
                 icon: Icon(Icons.payment),

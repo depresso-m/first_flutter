@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 import '../models/cart_item.dart';
 import '../widgets/back_button.dart';
-import 'order_success_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final List<CartItem> cart;
@@ -45,12 +45,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         _phoneController.text.trim(),
         _addressController.text.trim(),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => OrderSuccessScreen(),
-        ),
-      );
+      context.go('/order-success');
     }
   }
 

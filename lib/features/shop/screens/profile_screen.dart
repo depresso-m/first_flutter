@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../models/medicine.dart';
 import '../models/order.dart';
-import 'favourites_screen.dart';
-import 'orders_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   final List<Order> orders;
@@ -52,12 +51,7 @@ class ProfileScreen extends StatelessWidget {
               title: Text('История покупок'),
               trailing: Icon(Icons.chevron_right),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => OrdersScreen(orders: orders),
-                  ),
-                );
+                context.push('/orders');
               },
             ),
           ),
@@ -68,16 +62,7 @@ class ProfileScreen extends StatelessWidget {
               title: Text('Избранное'),
               trailing: Icon(Icons.chevron_right),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FavouritesScreen(
-                      favourites: favourites,
-                      onToggleFavourite: onToggleFavourite,
-                      onAdd: onAdd,
-                    ),
-                  ),
-                );
+                context.push('/favourites');
               },
             ),
           ),

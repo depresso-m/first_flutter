@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class OrderSuccessScreen extends StatelessWidget {
   const OrderSuccessScreen({super.key});
@@ -34,7 +35,7 @@ class OrderSuccessScreen extends StatelessWidget {
               SizedBox(height: 32),
               FilledButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  context.go('/');
                 },
                 style: FilledButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
