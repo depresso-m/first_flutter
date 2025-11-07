@@ -1,23 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../models/medicine.dart';
-import '../models/order.dart';
 import 'favourites_screen.dart';
 import 'orders_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
-  final List<Order> orders;
-  final Set<Medicine> favourites;
-  final Function(Medicine) onToggleFavourite;
-  final Function(Medicine) onAdd;
-
-  const ProfileScreen({
-    super.key,
-    required this.orders,
-    required this.favourites,
-    required this.onToggleFavourite,
-    required this.onAdd,
-  });
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +42,7 @@ class ProfileScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => OrdersScreen(orders: orders),
+                    builder: (context) => const OrdersScreen(),
                   ),
                 );
               },
@@ -71,11 +58,7 @@ class ProfileScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => FavouritesScreen(
-                      favourites: favourites,
-                      onToggleFavourite: onToggleFavourite,
-                      onAdd: onAdd,
-                    ),
+                    builder: (context) => const FavouritesScreen(),
                   ),
                 );
               },

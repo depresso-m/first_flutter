@@ -12,9 +12,7 @@ class CustomBackButton extends StatelessWidget {
         children: [
           IconButton(
             icon: Icon(Icons.arrow_back),
-
             onPressed: () => Navigator.of(context).pop(),
-
             tooltip: 'Назад',
           ),
         ],
