@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/app_state_widget.dart';
+import '../../../app/service_locator.dart';
+import '../../../app/app_state.dart';
 import '../widgets/medicine_tile.dart';
 
 class MedicinesScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppStateWidget.of(context);
+    final appState = getIt<AppState>();
 
     return ListenableBuilder(
       listenable: appState,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/app_state_widget.dart';
+import '../../../app/service_locator.dart';
+import '../../../app/app_state.dart';
 import '../../../shared/widgets/empty_placeholder.dart';
 import '../widgets/quantity_controls.dart';
 import 'checkout_screen.dart';
@@ -15,7 +16,7 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
-    final appState = AppStateWidget.of(context);
+    final appState = getIt<AppState>();
 
     return ListenableBuilder(
       listenable: appState,

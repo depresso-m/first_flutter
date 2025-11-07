@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../../../app/app_state_widget.dart';
+import '../../../app/service_locator.dart';
+import '../../../app/app_state.dart';
 import '../models/medicine.dart';
 
 class MedicineTile extends StatelessWidget {
@@ -11,7 +12,7 @@ class MedicineTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppStateWidget.of(context);
+    final appState = getIt<AppState>();
 
     return ListenableBuilder(
       listenable: appState,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/app_state_widget.dart';
+import '../../../app/service_locator.dart';
+import '../../../app/app_state.dart';
 import '../../../shared/widgets/empty_placeholder.dart';
 import '../state/order_state.dart';
 import '../widgets/status_chip.dart';
@@ -36,7 +37,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppStateWidget.of(context);
+    final appState = getIt<AppState>();
 
     return ListenableBuilder(
       listenable: appState,

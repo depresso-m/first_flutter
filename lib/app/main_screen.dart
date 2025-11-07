@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'app_state_widget.dart';
+import 'service_locator.dart';
+import 'app_state.dart';
 import '../features/shop/screens/cart_screen.dart';
 import '../features/shop/screens/medicines_screen.dart';
 import '../features/shop/screens/profile_screen.dart';
@@ -17,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppStateWidget.of(context);
+    final appState = getIt<AppState>();
 
     String appBarTitle;
     if (_selectedIndex == 0) {

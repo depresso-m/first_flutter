@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../app/app_state_widget.dart';
+import '../../../app/service_locator.dart';
+import '../../../app/app_state.dart';
 import '../widgets/back_button.dart';
 import 'order_success_screen.dart';
 
@@ -30,7 +31,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   void _submitOrder() {
     if (_formKey.currentState!.validate()) {
-      final appState = AppStateWidget.of(context);
+      final appState = getIt<AppState>();
       appState.makeOrder(
         _fullNameController.text.trim(),
         _emailController.text.trim(),
@@ -48,7 +49,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppStateWidget.of(context);
+    final appState = getIt<AppState>();
 
     return ListenableBuilder(
       listenable: appState,
