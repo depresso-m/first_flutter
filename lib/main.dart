@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'app/service_locator.dart';
 import 'app/main_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  setupServiceLocator();
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

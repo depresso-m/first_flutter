@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'service_locator.dart';
-import 'app_state.dart';
 import '../features/shop/screens/cart_screen.dart';
 import '../features/shop/screens/medicines_screen.dart';
 import '../features/shop/screens/profile_screen.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends ConsumerState<MainScreen> {
   int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    final appState = getIt<AppState>();
-
     String appBarTitle;
     if (_selectedIndex == 0) {
       appBarTitle = 'Аптека';
@@ -29,39 +26,34 @@ class _MainScreenState extends State<MainScreen> {
       appBarTitle = 'Профиль';
     }
 
-    return ListenableBuilder(
-      listenable: appState,
-      builder: (context, _) {
-        final screens = [
-          const MedicinesScreen(),
-          const CartScreen(),
-          const ProfileScreen(),
-        ];
+    final screens = [
+      const MedicinesScreen(),
+      const CartScreen(),
+      const ProfileScreen(),
+    ];
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(appBarTitle),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(appBarTitle),
+      ),
+      body: screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (i) => setState(() {
+          _selectedIndex = i;
+        }),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_pharmacy),
+            label: 'Лекарства',
           ),
-          body: screens[_selectedIndex],
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: (i) => setState(() {
-              _selectedIndex = i;
-            }),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.local_pharmacy),
-                label: 'Лекарства',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart),
-                label: 'Корзина',
-              ),
-              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Профиль'),
-            ],
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Корзина',
           ),
-        );
-      },
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Профиль'),
+        ],
+      ),
     );
   }
 }

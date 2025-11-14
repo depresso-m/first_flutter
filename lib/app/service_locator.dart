@@ -1,9 +1,9 @@
 import 'package:get_it/get_it.dart';
 
-import 'app_state.dart';
-
 final getIt = GetIt.instance;
 
 void setupServiceLocator() {
-  getIt.registerSingleton<AppState>(AppState());
+  // GetIt можно использовать для регистрации других сервисов
+  // (например, репозитории, API клиенты, утилиты)
+  // State management теперь через Riverpod
 }

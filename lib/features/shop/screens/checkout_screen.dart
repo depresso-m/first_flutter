@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/service_locator.dart';
-import '../../../app/app_state.dart';
+import '../providers/cart_provider.dart';
+import '../providers/orders_provider.dart';
 import '../widgets/back_button.dart';
 import 'order_success_screen.dart';
 
-class CheckoutScreen extends StatefulWidget {
+class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
 
   @override
-  State<CheckoutScreen> createState() => _CheckoutScreenState();
+  ConsumerState<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
-class _CheckoutScreenState extends State<CheckoutScreen> {
+class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final _formKey = GlobalKey<FormState>();
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -31,13 +32,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   void _submitOrder() {
     if (_formKey.currentState!.validate()) {
-      final appState = getIt<AppState>();
-      appState.makeOrder(
-        _fullNameController.text.trim(),
-        _emailController.text.trim(),
-        _phoneController.text.trim(),
-        _addressController.text.trim(),
-      );
+      ref.read(ordersNotifierProvider.notifier).makeOrder(
+            _fullNameController.text.trim(),
+            _emailController.text.trim(),
+            _phoneController.text.trim(),
+            _addressController.text.trim(),
+          );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -49,147 +49,140 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = getIt<AppState>();
+    final cart = ref.watch(cartNotifierProvider);
+    final total = cart.fold(
+      0.0,
+      (sum, item) => sum + item.medicine.price * item.quantity,
+    );
 
-    return ListenableBuilder(
-      listenable: appState,
-      builder: (context, _) {
-        final cart = appState.cart;
-        final total = cart.fold(
-          0.0,
-          (sum, item) => sum + item.medicine.price * item.quantity,
-        );
-
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Оформление заказа'),
-            leading: CustomBackButton(),
-          ),
-          body: Form(
-            key: _formKey,
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Text(
-                  'Данные покупателя',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  controller: _fullNameController,
-                  decoration: InputDecoration(
-                    labelText: 'ФИО',
-                    hintText: 'Иванов Иван Иванович',
-                    border: OutlineInputBorder(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Оформление заказа'),
+        leading: CustomBackButton(),
+      ),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Text(
+              'Данные покупателя',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
-                  textCapitalization: TextCapitalization.words,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Введите ФИО';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'example@mail.ru',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Введите email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Введите корректный email';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  controller: _phoneController,
-                  decoration: InputDecoration(
-                    labelText: 'Телефон',
-                    hintText: '+7 (999) 123-45-67',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Введите телефон';
-                    }
-                    if (value.trim().length < 10) {
-                      return 'Телефон должен содержать минимум 10 цифр';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  controller: _addressController,
-                  decoration: InputDecoration(
-                    labelText: 'Адрес (до квартиры)',
-                    hintText: 'г. Москва, ул. Ленина, д. 10',
-                    border: OutlineInputBorder(),
-                  ),
-                  textCapitalization: TextCapitalization.sentences,
-                  maxLines: 2,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Введите адрес';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 32),
-                Card(
-                  elevation: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Итого к оплате',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          '${total.toStringAsFixed(2)} ₽',
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 24),
-                FilledButton(
-                  onPressed: _submitOrder,
-                  style: FilledButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: Text(
-                    'Заказать',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ],
             ),
-          ),
-        );
-      },
+            SizedBox(height: 16),
+            TextFormField(
+              controller: _fullNameController,
+              decoration: InputDecoration(
+                labelText: 'ФИО',
+                hintText: 'Иванов Иван Иванович',
+                border: OutlineInputBorder(),
+              ),
+              textCapitalization: TextCapitalization.words,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Введите ФИО';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: _emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                hintText: 'example@mail.ru',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.emailAddress,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Введите email';
+                }
+                if (!value.contains('@')) {
+                  return 'Введите корректный email';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: _phoneController,
+              decoration: InputDecoration(
+                labelText: 'Телефон',
+                hintText: '+7 (999) 123-45-67',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Введите телефон';
+                }
+                if (value.trim().length < 10) {
+                  return 'Телефон должен содержать минимум 10 цифр';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: _addressController,
+              decoration: InputDecoration(
+                labelText: 'Адрес (до квартиры)',
+                hintText: 'г. Москва, ул. Ленина, д. 10',
+                border: OutlineInputBorder(),
+              ),
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 2,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Введите адрес';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 32),
+            Card(
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Итого к оплате',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '${total.toStringAsFixed(2)} ₽',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+            FilledButton(
+              onPressed: _submitOrder,
+              style: FilledButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: Text(
+                'Заказать',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

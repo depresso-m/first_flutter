@@ -1,52 +1,50 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/service_locator.dart';
-import '../../../app/app_state.dart';
 import '../models/medicine.dart';
+import '../providers/cart_provider.dart';
+import '../providers/favourites_provider.dart';
 
-class MedicineTile extends StatelessWidget {
+class MedicineTile extends ConsumerWidget {
   final Medicine medicine;
 
   const MedicineTile({super.key, required this.medicine});
 
   @override
-  Widget build(BuildContext context) {
-    final appState = getIt<AppState>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favourites = ref.watch(favouritesNotifierProvider);
+    final isFavourite = favourites.contains(medicine);
+    final favouritesNotifier = ref.read(favouritesNotifierProvider.notifier);
+    final cartNotifier = ref.read(cartNotifierProvider.notifier);
 
-    return ListenableBuilder(
-      listenable: appState,
-      builder: (context, _) {
-        final isFavourite = appState.isFavourite(medicine);
-        return Card(
-          clipBehavior: Clip.antiAlias,
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            leading: _buildImage(),
-            title: Text(
-              medicine.name,
-              style: Theme.of(context).textTheme.titleMedium,
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        leading: _buildImage(),
+        title: Text(
+          medicine.name,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        subtitle: Text('${medicine.price.toStringAsFixed(2)} ₽'),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              onPressed: () => favouritesNotifier.toggleFavourite(medicine),
+              icon: Icon(isFavourite ? Icons.favorite : Icons.favorite_border),
+              color: isFavourite ? Colors.red : null,
+              tooltip: isFavourite ? 'Убрать из избранного' : 'В избранное',
             ),
-            subtitle: Text('${medicine.price.toStringAsFixed(2)} ₽'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  onPressed: () => appState.toggleFavourite(medicine),
-                  icon: Icon(isFavourite ? Icons.favorite : Icons.favorite_border),
-                  color: isFavourite ? Colors.red : null,
-                  tooltip: isFavourite ? 'Убрать из избранного' : 'В избранное',
-                ),
-                FilledButton.icon(
-                  onPressed: () => appState.addToCart(medicine),
-                  icon: Icon(Icons.add_shopping_cart),
-                  label: Text('В корзину'),
-                ),
-              ],
+            FilledButton.icon(
+              onPressed: () => cartNotifier.addToCart(medicine),
+              icon: Icon(Icons.add_shopping_cart),
+              label: Text('В корзину'),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
@@ -59,11 +57,7 @@ class MedicineTile extends StatelessWidget {
           color: Colors.grey[300],
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(
-          Icons.medication,
-          color: Colors.grey[600],
-          size: 30,
-        ),
+        child: Icon(Icons.medication, color: Colors.grey[600], size: 30),
       );
     }
 
@@ -78,9 +72,7 @@ class MedicineTile extends StatelessWidget {
           width: 60,
           height: 60,
           color: Colors.grey[300],
-          child: const Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+          child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         ),
         errorWidget: (context, url, error) => Container(
           width: 60,
@@ -89,11 +81,7 @@ class MedicineTile extends StatelessWidget {
             color: Colors.grey[300],
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            Icons.error_outline,
-            color: Colors.grey[600],
-            size: 30,
-          ),
+          child: Icon(Icons.error_outline, color: Colors.grey[600], size: 30),
         ),
       ),
     );
