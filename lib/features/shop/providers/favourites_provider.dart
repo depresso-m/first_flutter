@@ -23,3 +23,6 @@ class FavouritesNotifier extends _$FavouritesNotifier {
     return state.contains(med);
   }
 }
+
+
+

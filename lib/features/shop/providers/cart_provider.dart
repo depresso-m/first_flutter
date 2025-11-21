@@ -41,3 +41,6 @@ class CartNotifier extends _$CartNotifier {
     state = [];
   }
 }
+
+
+

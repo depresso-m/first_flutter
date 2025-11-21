@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/medicine.dart';
 import '../providers/cart_provider.dart';
 import '../providers/favourites_provider.dart';
+import '../screens/medicine_detail_screen.dart';
 
 class MedicineTile extends ConsumerWidget {
   final Medicine medicine;
@@ -20,29 +21,39 @@ class MedicineTile extends ConsumerWidget {
 
     return Card(
       clipBehavior: Clip.antiAlias,
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        leading: _buildImage(),
-        title: Text(
-          medicine.name,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        subtitle: Text('${medicine.price.toStringAsFixed(2)} ₽'),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              onPressed: () => favouritesNotifier.toggleFavourite(medicine),
-              icon: Icon(isFavourite ? Icons.favorite : Icons.favorite_border),
-              color: isFavourite ? Colors.red : null,
-              tooltip: isFavourite ? 'Убрать из избранного' : 'В избранное',
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MedicineDetailScreen(medicine: medicine),
             ),
-            FilledButton.icon(
-              onPressed: () => cartNotifier.addToCart(medicine),
-              icon: Icon(Icons.add_shopping_cart),
-              label: Text('В корзину'),
-            ),
-          ],
+          );
+        },
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          leading: _buildImage(),
+          title: Text(
+            medicine.name,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          subtitle: Text('${medicine.price.toStringAsFixed(2)} ₽'),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () => favouritesNotifier.toggleFavourite(medicine),
+                icon: Icon(isFavourite ? Icons.favorite : Icons.favorite_border),
+                color: isFavourite ? Colors.red : null,
+                tooltip: isFavourite ? 'Убрать из избранного' : 'В избранное',
+              ),
+              FilledButton.icon(
+                onPressed: () => cartNotifier.addToCart(medicine),
+                icon: Icon(Icons.add_shopping_cart),
+                label: Text('В корзину'),
+              ),
+            ],
+          ),
         ),
       ),
     );
