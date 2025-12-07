@@ -5,6 +5,7 @@ import '../providers/account_profile_provider.dart';
 import '../providers/auth_provider.dart';
 import 'favourites_screen.dart';
 import 'orders_screen.dart';
+import 'pharmacies_screen.dart';
 import 'profile_settings_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -95,6 +96,22 @@ class ProfileScreen extends ConsumerWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => const FavouritesScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.local_pharmacy),
+                    title: const Text('Найти аптеку'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PharmaciesScreen(),
                         ),
                       );
                     },
