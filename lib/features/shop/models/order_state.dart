@@ -1,4 +1,4 @@
-import '../models/order.dart';
+import 'order.dart';
 
 enum OrderStatus { received, formed, assembled, handed }
 

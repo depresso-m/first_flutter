@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../state/order_state.dart';
+import '../models/order_state.dart';
 
 class StatusChip extends StatelessWidget {
   final OrderStatus status;

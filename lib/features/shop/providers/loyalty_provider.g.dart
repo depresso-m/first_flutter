@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'orders_provider.dart';
+part of 'loyalty_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$ordersNotifierHash() => r'26cf21fa2f9061e69763b9a49a3fbd695cce6fda';
+String _$loyaltyNotifierHash() => r'd7331f40803d096f1ab7e21ba6a1686d58556975';
 
-/// See also [OrdersNotifier].
-@ProviderFor(OrdersNotifier)
-final ordersNotifierProvider =
-    NotifierProvider<OrdersNotifier, List<Order>>.internal(
-      OrdersNotifier.new,
-      name: r'ordersNotifierProvider',
+/// See also [LoyaltyNotifier].
+@ProviderFor(LoyaltyNotifier)
+final loyaltyNotifierProvider =
+    NotifierProvider<LoyaltyNotifier, LoyaltyState>.internal(
+      LoyaltyNotifier.new,
+      name: r'loyaltyNotifierProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$ordersNotifierHash,
+          : _$loyaltyNotifierHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
-typedef _$OrdersNotifier = Notifier<List<Order>>;
+typedef _$LoyaltyNotifier = Notifier<LoyaltyState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

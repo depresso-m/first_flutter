@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/widgets/empty_placeholder.dart';
 import '../providers/orders_provider.dart';
-import '../state/order_state.dart';
+import '../models/order_state.dart';
 import '../widgets/back_button.dart';
 import '../widgets/status_chip.dart';
 
