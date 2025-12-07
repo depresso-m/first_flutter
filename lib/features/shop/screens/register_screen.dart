@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/router.dart';
 import '../providers/auth_provider.dart';
-import '../widgets/auth_routes.dart';
-import 'login_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -42,10 +42,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             password: _passwordController.text,
             displayName: _nameController.text,
           );
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        authSlideRoute(page: const LoginScreen(), reverse: true),
-      );
+      // После успешной регистрации go_router автоматически сделает редирект
     } on AuthException catch (error) {
       messenger.showSnackBar(SnackBar(content: Text(error.message)));
     } finally {
@@ -131,14 +128,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 12),
                   TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                        authSlideRoute(
-                          page: const LoginScreen(),
-                          reverse: true,
-                        ),
-                      );
-                    },
+                    onPressed: () => context.go(AppRoutes.login),
                     child: const Text('Уже есть аккаунт? Войти'),
                   ),
                 ],

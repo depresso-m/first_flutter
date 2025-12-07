@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/router.dart';
 import '../models/pharmacy.dart';
 import '../providers/pharmacies_provider.dart';
-import 'pharmacy_detail_screen.dart';
+import '../widgets/back_button.dart';
 
 class PharmaciesScreen extends ConsumerWidget {
   const PharmaciesScreen({super.key});
@@ -15,6 +17,7 @@ class PharmaciesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Аптеки'),
+        leading: const CustomBackButton(),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
@@ -41,14 +44,7 @@ class _PharmacyCard extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => PharmacyDetailScreen(pharmacy: pharmacy),
-            ),
-          );
-        },
+        onTap: () => context.push(AppRoutes.pharmacyDetail, extra: pharmacy),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -107,4 +103,3 @@ class _PharmacyCard extends StatelessWidget {
     );
   }
 }
-

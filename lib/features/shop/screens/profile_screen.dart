@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/router.dart';
 import '../providers/account_profile_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/loyalty_provider.dart';
-import 'favourites_screen.dart';
-import 'loyalty_screen.dart';
-import 'orders_screen.dart';
-import 'pharmacies_screen.dart';
-import 'profile_settings_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -79,14 +76,7 @@ class ProfileScreen extends ConsumerWidget {
                     leading: const Icon(Icons.receipt_long),
                     title: const Text('История покупок'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const OrdersScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.push(AppRoutes.orders),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -95,14 +85,7 @@ class ProfileScreen extends ConsumerWidget {
                     leading: const Icon(Icons.favorite),
                     title: const Text('Избранное'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const FavouritesScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.push(AppRoutes.favourites),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -111,14 +94,7 @@ class ProfileScreen extends ConsumerWidget {
                     leading: const Icon(Icons.local_pharmacy),
                     title: const Text('Найти аптеку'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const PharmaciesScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.push(AppRoutes.pharmacies),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -127,14 +103,7 @@ class ProfileScreen extends ConsumerWidget {
                     leading: const Icon(Icons.settings),
                     title: const Text('Настройки профиля'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ProfileSettingsScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.push(AppRoutes.profileSettings),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -162,12 +131,7 @@ class _LoyaltyCard extends ConsumerWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const LoyaltyScreen()),
-          );
-        },
+        onTap: () => context.push(AppRoutes.loyalty),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(

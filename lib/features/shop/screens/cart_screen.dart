@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/router.dart';
 import '../../../shared/widgets/empty_placeholder.dart';
 import '../providers/cart_provider.dart';
 import '../widgets/quantity_controls.dart';
-import 'checkout_screen.dart';
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
@@ -118,14 +119,7 @@ class CartScreen extends ConsumerWidget {
               FilledButton.icon(
                 onPressed: cart.isEmpty
                     ? null
-                    : () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CheckoutScreen(),
-                          ),
-                        );
-                      },
+                    : () => context.push(AppRoutes.checkout),
                 icon: Icon(Icons.payment),
                 label: Text('Оформить'),
               ),

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/router.dart';
 import '../providers/cart_provider.dart';
 import '../providers/loyalty_provider.dart';
 import '../providers/orders_provider.dart';
 import '../widgets/back_button.dart';
-import 'order_failure_screen.dart';
-import 'order_success_screen.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -44,12 +44,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             _addressController.text.trim(),
             pointsToUse: _usePoints ? _pointsToUse : 0,
           );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const OrderFailureScreen(),
-        ),
-      );
+      context.go(AppRoutes.orderSuccess);
     }
   }
 

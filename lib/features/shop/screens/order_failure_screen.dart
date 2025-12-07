@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../app/router.dart';
 
 class OrderFailureScreen extends StatelessWidget {
   const OrderFailureScreen({super.key});
@@ -33,9 +36,7 @@ class OrderFailureScreen extends StatelessWidget {
               ),
               SizedBox(height: 32),
               FilledButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+                onPressed: () => context.pop(),
                 style: FilledButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 ),
@@ -43,9 +44,7 @@ class OrderFailureScreen extends StatelessWidget {
               ),
               SizedBox(height: 12),
               TextButton(
-                onPressed: () {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
+                onPressed: () => context.go(AppRoutes.home),
                 child: Text('Вернуться в каталог'),
               ),
             ],
@@ -55,4 +54,3 @@ class OrderFailureScreen extends StatelessWidget {
     );
   }
 }
-

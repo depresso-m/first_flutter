@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../models/medicine.dart';
 import '../providers/cart_provider.dart';
 import '../providers/favourites_provider.dart';
-import '../screens/medicine_detail_screen.dart';
 
 class MedicineTile extends ConsumerWidget {
   final Medicine medicine;
@@ -22,14 +22,7 @@ class MedicineTile extends ConsumerWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MedicineDetailScreen(medicine: medicine),
-            ),
-          );
-        },
+        onTap: () => context.push('/medicine', extra: medicine),
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           leading: _buildImage(),

@@ -1,47 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../features/shop/screens/cart_screen.dart';
-import '../features/shop/screens/medicines_screen.dart';
-import '../features/shop/screens/profile_screen.dart';
+import 'router.dart';
 
-class MainScreen extends ConsumerStatefulWidget {
-  const MainScreen({super.key});
+class MainScreen extends StatelessWidget {
+  final int currentIndex;
+  final Widget child;
 
-  @override
-  ConsumerState<MainScreen> createState() => _MainScreenState();
-}
+  const MainScreen({
+    super.key,
+    required this.currentIndex,
+    required this.child,
+  });
 
-class _MainScreenState extends ConsumerState<MainScreen> {
-  int _selectedIndex = 0;
+  static const _routes = [
+    AppRoutes.home,
+    AppRoutes.cart,
+    AppRoutes.profile,
+  ];
+
+  static const _titles = ['Аптека', 'Корзина', 'Профиль'];
 
   @override
   Widget build(BuildContext context) {
-    String appBarTitle;
-    if (_selectedIndex == 0) {
-      appBarTitle = 'Аптека';
-    } else if (_selectedIndex == 1) {
-      appBarTitle = 'Корзина';
-    } else {
-      appBarTitle = 'Профиль';
-    }
-
-    final screens = [
-      const MedicinesScreen(),
-      const CartScreen(),
-      const ProfileScreen(),
-    ];
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(appBarTitle),
+        title: Text(_titles[currentIndex]),
       ),
-      body: screens[_selectedIndex],
+      body: child,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (i) => setState(() {
-          _selectedIndex = i;
-        }),
+        currentIndex: currentIndex,
+        onTap: (index) => context.go(_routes[index]),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.local_pharmacy),
@@ -51,7 +40,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             icon: Icon(Icons.shopping_cart),
             label: 'Корзина',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Профиль'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Профиль',
+          ),
         ],
       ),
     );

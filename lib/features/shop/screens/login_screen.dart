@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/router.dart';
 import '../providers/auth_provider.dart';
-import '../widgets/auth_routes.dart';
-import 'register_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -39,6 +39,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             email: _emailController.text,
             password: _passwordController.text,
           );
+      // После успешного логина go_router автоматически сделает редирект
     } on AuthException catch (error) {
       messenger.showSnackBar(SnackBar(content: Text(error.message)));
     } finally {
@@ -113,11 +114,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 12),
                   TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                        authSlideRoute(page: const RegisterScreen()),
-                      );
-                    },
+                    onPressed: () => context.go(AppRoutes.register),
                     child: const Text('Нет аккаунта? Зарегистрируйтесь'),
                   ),
                 ],
