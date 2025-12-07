@@ -3,10 +3,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/auth_account.dart';
 import 'auth_provider.dart';
 
-part 'account_profile_delegate.g.dart';
+part 'account_profile_provider.g.dart';
 
-class AccountProfileSnapshot {
-  const AccountProfileSnapshot(this.account);
+class AccountProfile {
+  const AccountProfile(this.account);
 
   final AuthAccount? account;
 
@@ -25,10 +25,11 @@ class AccountProfileSnapshot {
 }
 
 @Riverpod(keepAlive: true)
-class AccountProfileDelegate extends _$AccountProfileDelegate {
+class AccountProfileNotifier extends _$AccountProfileNotifier {
   @override
-  AccountProfileSnapshot build() {
+  AccountProfile build() {
     final account = ref.watch(authControllerProvider);
-    return AccountProfileSnapshot(account);
+    return AccountProfile(account);
   }
 }
+

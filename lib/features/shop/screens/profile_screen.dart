@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/account_profile_delegate.dart';
+import '../providers/account_profile_provider.dart';
 import '../providers/auth_provider.dart';
 import 'favourites_screen.dart';
 import 'orders_screen.dart';
@@ -12,8 +12,8 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final delegate = ref.watch(accountProfileDelegateProvider);
-    final account = delegate.account;
+    final profile = ref.watch(accountProfileNotifierProvider);
+    final account = profile.account;
 
     if (account == null) {
       return const Center(child: CircularProgressIndicator());
@@ -43,7 +43,7 @@ class ProfileScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(delegate.fullName, style: textTheme.titleLarge),
+                    Text(profile.fullName, style: textTheme.titleLarge),
                     const SizedBox(height: 4),
                     Text(account.email, style: textTheme.bodyMedium),
                   ],

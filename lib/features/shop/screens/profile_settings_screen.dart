@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/account_profile_delegate.dart';
+import '../providers/account_profile_provider.dart';
 import '../providers/auth_provider.dart';
 
 class ProfileSettingsScreen extends ConsumerStatefulWidget {
@@ -44,7 +44,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   }
 
   void _syncControllers() {
-    final account = ref.watch(accountProfileDelegateProvider).account;
+    final account = ref.watch(accountProfileNotifierProvider).account;
     if (account == null) return;
 
     void sync(TextEditingController controller, String value) {

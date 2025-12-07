@@ -14,3 +14,6 @@ Route<T> authSlideRoute<T>({required Widget page, bool reverse = false}) {
     },
   );
 }
+
+
+
