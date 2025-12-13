@@ -2,48 +2,42 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../features/shop/models/medicine.dart';
-import '../features/shop/models/pharmacy.dart';
-import '../features/shop/providers/auth_provider.dart';
-import '../features/shop/screens/cart_screen.dart';
-import '../features/shop/screens/checkout_screen.dart';
-import '../features/shop/screens/favourites_screen.dart';
-import '../features/shop/screens/login_screen.dart';
-import '../features/shop/screens/loyalty_screen.dart';
-import '../features/shop/screens/medicine_detail_screen.dart';
-import '../features/shop/screens/medicines_screen.dart';
-import '../features/shop/screens/order_failure_screen.dart';
-import '../features/shop/screens/order_success_screen.dart';
-import '../features/shop/screens/orders_screen.dart';
-import '../features/shop/screens/pharmacies_screen.dart';
-import '../features/shop/screens/pharmacy_detail_screen.dart';
-import '../features/shop/screens/profile_screen.dart';
-import '../features/shop/screens/profile_settings_screen.dart';
-import '../features/shop/screens/register_screen.dart';
+import '../core/models/medicine.dart';
+import '../core/models/pharmacy.dart';
+import '../presentation/providers/auth_provider.dart';
+import '../presentation/screens/cart_screen.dart';
+import '../presentation/screens/checkout_screen.dart';
+import '../presentation/screens/favourites_screen.dart';
+import '../presentation/screens/login_screen.dart';
+import '../presentation/screens/loyalty_screen.dart';
+import '../presentation/screens/medicine_detail_screen.dart';
+import '../presentation/screens/medicines_screen.dart';
+import '../presentation/screens/order_failure_screen.dart';
+import '../presentation/screens/order_success_screen.dart';
+import '../presentation/screens/orders_screen.dart';
+import '../presentation/screens/pharmacies_screen.dart';
+import '../presentation/screens/pharmacy_detail_screen.dart';
+import '../presentation/screens/profile_screen.dart';
+import '../presentation/screens/profile_settings_screen.dart';
+import '../presentation/screens/register_screen.dart';
 import 'main_screen.dart';
 
 part 'router.g.dart';
 
-/// Маршруты приложения
 abstract class AppRoutes {
-  // Auth
   static const login = '/login';
   static const register = '/register';
 
-  // Main tabs
   static const home = '/';
   static const cart = '/cart';
   static const profile = '/profile';
 
-  // Medicines
   static const medicineDetail = '/medicine';
 
-  // Cart flow
   static const checkout = '/cart/checkout';
   static const orderSuccess = '/cart/order-success';
   static const orderFailure = '/cart/order-failure';
 
-  // Profile sub-routes
   static const orders = '/profile/orders';
   static const favourites = '/profile/favourites';
   static const pharmacies = '/profile/pharmacies';
@@ -51,7 +45,6 @@ abstract class AppRoutes {
   static const loyalty = '/profile/loyalty';
   static const profileSettings = '/profile/settings';
 
-  /// Определяет индекс вкладки по пути
   static int getTabIndex(String location) {
     if (location.startsWith('/profile')) return 2;
     if (location.startsWith('/cart')) return 1;
@@ -61,7 +54,7 @@ abstract class AppRoutes {
 
 @riverpod
 GoRouter router(Ref ref) {
-  final authState = ref.watch(authControllerProvider);
+  final authState = ref.watch(authNotifierProvider);
 
   return GoRouter(
     initialLocation: AppRoutes.home,
@@ -82,7 +75,6 @@ GoRouter router(Ref ref) {
       return null;
     },
     routes: [
-      // Auth routes
       GoRoute(
         path: AppRoutes.login,
         name: 'login',
@@ -94,7 +86,6 @@ GoRouter router(Ref ref) {
         builder: (context, state) => const RegisterScreen(),
       ),
 
-      // Shell with bottom navigation
       ShellRoute(
         builder: (context, state, child) {
           return MainScreen(
@@ -103,7 +94,6 @@ GoRouter router(Ref ref) {
           );
         },
         routes: [
-          // Tab 0: Medicines
           GoRoute(
             path: AppRoutes.home,
             name: 'medicines',
@@ -122,7 +112,6 @@ GoRouter router(Ref ref) {
             ],
           ),
 
-          // Tab 1: Cart
           GoRoute(
             path: AppRoutes.cart,
             name: 'cart',
@@ -148,7 +137,6 @@ GoRouter router(Ref ref) {
             ],
           ),
 
-          // Tab 2: Profile
           GoRoute(
             path: AppRoutes.profile,
             name: 'profile',

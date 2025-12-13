@@ -1,0 +1,52 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../app/router.dart';
+
+class OrderSuccessScreen extends StatelessWidget {
+  const OrderSuccessScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.check_circle,
+                size: 120,
+                color: Colors.green,
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Заказ успешно оформлен!',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Ваш заказ принят в обработку.\nМы свяжемся с вами в ближайшее время.',
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              FilledButton(
+                onPressed: () => context.go(AppRoutes.home),
+                style: FilledButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                ),
+                child: const Text('Вернуться в каталог'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
