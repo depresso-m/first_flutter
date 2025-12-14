@@ -24,7 +24,7 @@ class AddressRepositoryImpl implements AddressRepository {
     }
 
     final dtos = await _dataSource.suggestCities(query);
-    final suggestions = AddressMapper.fromDtoList(dtos);
+    final suggestions = dtos.toModelList();
 
     _cache[cacheKey] = _CacheEntry(suggestions);
     return suggestions;
@@ -41,7 +41,7 @@ class AddressRepositoryImpl implements AddressRepository {
     }
 
     final dtos = await _dataSource.suggestStreets(query);
-    final suggestions = AddressMapper.fromDtoList(dtos);
+    final suggestions = dtos.toModelList();
 
     _cache[cacheKey] = _CacheEntry(suggestions);
     return suggestions;
@@ -58,7 +58,7 @@ class AddressRepositoryImpl implements AddressRepository {
     }
 
     final dtos = await _dataSource.suggestFullAddress(query);
-    final suggestions = AddressMapper.fromDtoList(dtos);
+    final suggestions = dtos.toModelList();
 
     _cache[cacheKey] = _CacheEntry(suggestions);
     return suggestions;
@@ -78,7 +78,7 @@ class AddressRepositoryImpl implements AddressRepository {
     }
 
     final dtos = await _dataSource.suggestByCity(query, cityFiasId);
-    final suggestions = AddressMapper.fromDtoList(dtos);
+    final suggestions = dtos.toModelList();
 
     _cache[cacheKey] = _CacheEntry(suggestions);
     return suggestions;
@@ -95,7 +95,7 @@ class AddressRepositoryImpl implements AddressRepository {
     }
 
     final dtos = await _dataSource.refineHouse(streetQuery);
-    final suggestions = AddressMapper.fromDtoList(dtos);
+    final suggestions = dtos.toModelList();
 
     _cache[cacheKey] = _CacheEntry(suggestions);
     return suggestions;

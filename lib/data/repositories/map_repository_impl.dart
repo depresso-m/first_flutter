@@ -4,6 +4,7 @@ import '../../core/models/pharmacy.dart';
 import '../../domain/interfaces/repositories/map_repository.dart';
 import '../datasources/api/nominatim/nominatim_api_datasource.dart';
 import '../datasources/api/overpass/overpass_api_datasource.dart';
+import '../mappers/geo_mapper.dart';
 import '../mappers/pharmacy_mapper.dart';
 
 /// Implementation of MapRepository using Nominatim and Overpass APIs
@@ -35,10 +36,7 @@ class MapRepositoryImpl implements MapRepository {
     final place = await _nominatimApi.geocodeCity(cityName);
     if (place == null) return null;
 
-    final geoPoint = GeoPoint(
-      latitude: place.latitude,
-      longitude: place.longitude,
-    );
+    final geoPoint = place.toGeoPoint();
 
     _geocodeCache[cacheKey] = _CacheEntry(geoPoint);
     return geoPoint;
@@ -62,7 +60,7 @@ class MapRepositoryImpl implements MapRepository {
       radiusMeters,
     );
     
-    final pharmacies = PharmacyMapper.fromOverpassDtoList(elements);
+    final pharmacies = elements.toModelList();
     _pharmacyCache[cacheKey] = _CacheEntry(pharmacies);
     return pharmacies;
   }
@@ -76,7 +74,7 @@ class MapRepositoryImpl implements MapRepository {
     }
 
     final elements = await _overpassApi.getPharmaciesInBounds(bounds);
-    final pharmacies = PharmacyMapper.fromOverpassDtoList(elements);
+    final pharmacies = elements.toModelList();
     
     _pharmacyCache[cacheKey] = _CacheEntry(pharmacies);
     return pharmacies;
@@ -98,7 +96,7 @@ class MapRepositoryImpl implements MapRepository {
     }
 
     final elements = await _overpassApi.getPharmaciesByName(bounds, nameFilter);
-    final pharmacies = PharmacyMapper.fromOverpassDtoList(elements);
+    final pharmacies = elements.toModelList();
     
     _pharmacyCache[cacheKey] = _CacheEntry(pharmacies);
     return pharmacies;

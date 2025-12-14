@@ -4,120 +4,121 @@ import '../../core/models/medicine.dart';
 import '../datasources/api/openfda/dto/openfda_drug_dto.dart';
 import '../datasources/api/openfda/dto/openfda_label_dto.dart';
 
-/// Mapper for converting OpenFDA DTOs to Medicine entities
-class MedicineMapper {
-  static final _random = Random();
-
-  /// Convert OpenFdaDrugDto to Medicine
-  static Medicine fromDrugDto(OpenFdaDrugDto dto, {double? price}) {
-    final brandName = dto.openfda?.brandName?.firstOrNull ?? '';
-    final genericName = dto.openfda?.genericName?.firstOrNull ?? '';
+/// Extension для преобразования OpenFdaDrugDto в Medicine
+extension OpenFdaDrugDtoMapper on OpenFdaDrugDto {
+  /// Преобразует DTO в бизнес-модель Medicine
+  Medicine toModel({double? price}) {
+    final brandName = openfda?.brandName?.firstOrNull ?? '';
+    final genericName = openfda?.genericName?.firstOrNull ?? '';
     final name = brandName.isNotEmpty ? brandName : genericName;
 
-    // Get dosage form from products if available
+    // Получаем форму выпуска из products если доступно
     String? dosageForm;
-    if (dto.products != null && dto.products!.isNotEmpty) {
-      dosageForm = dto.products!.first.dosageForm;
+    if (products != null && products!.isNotEmpty) {
+      dosageForm = products!.first.dosageForm;
     }
 
-    // Get active ingredient from products or openfda
+    // Получаем активное вещество из products или openfda
     String? activeIngredient;
-    if (dto.products != null &&
-        dto.products!.isNotEmpty &&
-        dto.products!.first.activeIngredients != null &&
-        dto.products!.first.activeIngredients!.isNotEmpty) {
-      final ingredient = dto.products!.first.activeIngredients!.first;
+    if (products != null &&
+        products!.isNotEmpty &&
+        products!.first.activeIngredients != null &&
+        products!.first.activeIngredients!.isNotEmpty) {
+      final ingredient = products!.first.activeIngredients!.first;
       activeIngredient = ingredient.name;
       if (ingredient.strength != null) {
         activeIngredient = '${ingredient.name} (${ingredient.strength})';
       }
     } else {
-      activeIngredient = dto.openfda?.substanceName?.firstOrNull;
+      activeIngredient = openfda?.substanceName?.firstOrNull;
     }
 
     return Medicine(
-      id: dto.applicationNumber ?? _generateId(),
+      id: applicationNumber ?? _generateId(),
       name: name.isEmpty ? 'Unknown Drug' : (_capitalizeWords(name) ?? name),
       brandName: _capitalizeWords(brandName),
       genericName: _capitalizeWords(genericName),
       price: price ?? _generateRealisticPrice(),
       manufacturer: _capitalizeWords(
-        dto.openfda?.manufacturerName?.firstOrNull ?? dto.sponsorName,
+        openfda?.manufacturerName?.firstOrNull ?? sponsorName,
       ),
       activeIngredient: activeIngredient,
-      ndc: dto.openfda?.productNdc?.firstOrNull,
+      ndc: openfda?.productNdc?.firstOrNull,
       dosageForm: dosageForm,
-      route: dto.openfda?.route?.firstOrNull,
-      pharmClass: dto.openfda?.pharmClassEpc?.firstOrNull,
+      route: openfda?.route?.firstOrNull,
+      pharmClass: openfda?.pharmClassEpc?.firstOrNull,
     );
-  }
-
-  /// Convert list of DTOs to Medicines
-  static List<Medicine> fromDrugDtoList(List<OpenFdaDrugDto> dtos) {
-    return dtos
-        .where((dto) =>
-            dto.openfda?.brandName?.isNotEmpty == true ||
-            dto.openfda?.genericName?.isNotEmpty == true)
-        .map((dto) => fromDrugDto(dto))
-        .toList();
-  }
-
-  /// Create MedicineDetails from label DTO
-  static MedicineDetails fromLabelDto(OpenFdaLabelDto dto) {
-    return MedicineDetails(
-      indications: dto.indications?.firstOrNull,
-      dosageAndAdministration: dto.dosageAndAdministration?.firstOrNull,
-      warnings: dto.warnings?.firstOrNull,
-      adverseReactions: dto.adverseReactions?.firstOrNull,
-      drugInteractions: dto.drugInteractions?.firstOrNull,
-      contraindications: dto.contraindications?.firstOrNull,
-      description: dto.description?.firstOrNull,
-      storageAndHandling: dto.storageAndHandling?.firstOrNull,
-    );
-  }
-
-  /// Generate a realistic price in rubles
-  static double _generateRealisticPrice() {
-    // Prices range from 50 to 5000 rubles with some common values
-    final priceRanges = [
-      (50.0, 200.0, 0.3), // 30% cheap
-      (200.0, 800.0, 0.4), // 40% medium
-      (800.0, 2000.0, 0.2), // 20% expensive
-      (2000.0, 5000.0, 0.1), // 10% premium
-    ];
-
-    final roll = _random.nextDouble();
-    double cumulative = 0;
-
-    for (final (min, max, probability) in priceRanges) {
-      cumulative += probability;
-      if (roll < cumulative) {
-        final price = min + _random.nextDouble() * (max - min);
-        // Round to .00, .50, or .99
-        final rounded = (price / 50).round() * 50;
-        return rounded.toDouble();
-      }
-    }
-
-    return 500.0;
-  }
-
-  static String _generateId() {
-    return 'GEN${DateTime.now().millisecondsSinceEpoch}_${_random.nextInt(10000)}';
-  }
-
-  static String? _capitalizeWords(String? text) {
-    if (text == null || text.isEmpty) return text;
-    return text
-        .toLowerCase()
-        .split(' ')
-        .map((word) =>
-            word.isEmpty ? '' : '${word[0].toUpperCase()}${word.substring(1)}')
-        .join(' ');
   }
 }
 
-/// Additional medicine details from label
+extension OpenFdaLabelDtoMapper on OpenFdaLabelDto {
+  MedicineDetails toModel() {
+    return MedicineDetails(
+      indications: indications?.firstOrNull,
+      dosageAndAdministration: dosageAndAdministration?.firstOrNull,
+      warnings: warnings?.firstOrNull,
+      adverseReactions: adverseReactions?.firstOrNull,
+      drugInteractions: drugInteractions?.firstOrNull,
+      contraindications: contraindications?.firstOrNull,
+      description: description?.firstOrNull,
+      storageAndHandling: storageAndHandling?.firstOrNull,
+    );
+  }
+}
+
+/// Extension для преобразования списка DTO в список моделей
+extension OpenFdaDrugDtoListMapper on List<OpenFdaDrugDto> {
+  /// Преобразует список DTO в список Medicine
+  List<Medicine> toModelList({double? price}) {
+    return where((dto) =>
+            dto.openfda?.brandName?.isNotEmpty == true ||
+            dto.openfda?.genericName?.isNotEmpty == true)
+        .map((dto) => dto.toModel(price: price))
+        .toList();
+  }
+}
+
+// Вспомогательные функции
+final _random = Random();
+
+double _generateRealisticPrice() {
+  final priceRanges = [
+    (50.0, 200.0, 0.3),
+    (200.0, 800.0, 0.4),
+    (800.0, 2000.0, 0.2),
+    (2000.0, 5000.0, 0.1),
+  ];
+
+  final roll = _random.nextDouble();
+  double cumulative = 0;
+
+  for (final (min, max, probability) in priceRanges) {
+    cumulative += probability;
+    if (roll < cumulative) {
+      final price = min + _random.nextDouble() * (max - min);
+      final rounded = (price / 50).round() * 50;
+      return rounded.toDouble();
+    }
+  }
+
+  return 500.0;
+}
+
+String _generateId() {
+  return 'GEN${DateTime.now().millisecondsSinceEpoch}_${_random.nextInt(10000)}';
+}
+
+String? _capitalizeWords(String? text) {
+  if (text == null || text.isEmpty) return text;
+  return text
+      .toLowerCase()
+      .split(' ')
+      .map((word) =>
+          word.isEmpty ? '' : '${word[0].toUpperCase()}${word.substring(1)}')
+      .join(' ');
+}
+
+/// Дополнительная информация о лекарстве из этикетки
 class MedicineDetails {
   final String? indications;
   final String? dosageAndAdministration;

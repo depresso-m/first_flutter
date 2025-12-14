@@ -90,7 +90,7 @@ class MedicineRepositoryImpl implements MedicineRepository {
       skip: skip,
       limit: limit,
     );
-    final medicines = MedicineMapper.fromDrugDtoList(dtos);
+    final medicines = dtos.toModelList();
 
     _searchCache[cacheKey] = _CacheEntry(medicines);
     return medicines;
@@ -107,7 +107,7 @@ class MedicineRepositoryImpl implements MedicineRepository {
     }
 
     final dtos = await _openFdaDataSource.searchByName(query);
-    final medicines = MedicineMapper.fromDrugDtoList(dtos);
+    final medicines = dtos.toModelList();
 
     _searchCache[cacheKey] = _CacheEntry(medicines);
     return medicines;
@@ -125,7 +125,7 @@ class MedicineRepositoryImpl implements MedicineRepository {
     final labelDto = await _openFdaDataSource.getDrugLabel(ndc);
     if (labelDto == null) return null;
 
-    final details = MedicineMapper.fromLabelDto(labelDto);
+    final details = labelDto.toModel();
     _detailsCache[ndc] = _CacheEntry(details);
     return details;
   }
@@ -141,7 +141,7 @@ class MedicineRepositoryImpl implements MedicineRepository {
     }
 
     final dtos = await _openFdaDataSource.getAnalogsBySubstance(activeIngredient);
-    final medicines = MedicineMapper.fromDrugDtoList(dtos);
+    final medicines = dtos.toModelList();
 
     _searchCache[cacheKey] = _CacheEntry(medicines);
     return medicines;
@@ -165,7 +165,7 @@ class MedicineRepositoryImpl implements MedicineRepository {
     }
 
     final dtos = await _openFdaDataSource.getDrugsByManufacturer(manufacturerName);
-    final medicines = MedicineMapper.fromDrugDtoList(dtos);
+    final medicines = dtos.toModelList();
 
     _searchCache[cacheKey] = _CacheEntry(medicines);
     return medicines;
