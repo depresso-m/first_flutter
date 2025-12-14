@@ -1,47 +1,38 @@
-import 'package:dio/dio.dart';
-
+import '../../../../core/exceptions/api_exception.dart';
 import '../../../../core/network/dio_client.dart';
 import 'dto/nominatim_place_dto.dart';
+import 'nominatim_retrofit_api.dart';
 
 /// Data source for Nominatim (OpenStreetMap geocoding) API
 abstract class NominatimApiDataSource {
-  /// GET /search?q={city}&format=json&limit=1
   Future<NominatimPlaceDto?> geocodeCity(String cityName);
 
-  /// GET /search?q={query}&format=json&limit=5
   Future<List<NominatimPlaceDto>> searchPlaces(String query, {int limit = 5});
 
-  /// GET /reverse?lat={lat}&lon={lon}&format=json
   Future<NominatimPlaceDto?> reverseGeocode(double lat, double lon);
 }
 
 class NominatimApiDataSourceImpl implements NominatimApiDataSource {
-  final Dio _dio;
+  final NominatimRetrofitApi _api;
 
-  NominatimApiDataSourceImpl({Dio? dio})
-      : _dio = dio ?? DioClient.nominatim().dio;
+  NominatimApiDataSourceImpl({NominatimRetrofitApi? api})
+      : _api = api ?? NominatimRetrofitApi(DioClient.nominatim().dio);
 
   @override
   Future<NominatimPlaceDto?> geocodeCity(String cityName) async {
     if (cityName.trim().isEmpty) return null;
 
     try {
-      final response = await _dio.get(
-        '/search',
-        queryParameters: {
-          'q': cityName,
-          'format': 'json',
-          'limit': 1,
-          'addressdetails': 1,
-          'countrycodes': 'ru',
-        },
+      final response = await _api.geocodeCity(
+        cityName,
+        'json',
+        1,
+        1,
+        'ru',
       );
-
-      final data = response.data as List<dynamic>;
-      if (data.isEmpty) return null;
-      return NominatimPlaceDto.fromJson(data.first as Map<String, dynamic>);
-    } on DioException catch (e) {
-      throw e.asApiException;
+      return response.isNotEmpty ? response.first : null;
+    } catch (e) {
+      throw _handleError(e);
     }
   }
 
@@ -53,43 +44,39 @@ class NominatimApiDataSourceImpl implements NominatimApiDataSource {
     if (query.trim().isEmpty) return [];
 
     try {
-      final response = await _dio.get(
-        '/search',
-        queryParameters: {
-          'q': query,
-          'format': 'json',
-          'limit': limit,
-          'addressdetails': 1,
-        },
+      return await _api.searchPlaces(
+        query,
+        'json',
+        limit,
+        1,
       );
-
-      final data = response.data as List<dynamic>;
-      return data
-          .map((e) => NominatimPlaceDto.fromJson(e as Map<String, dynamic>))
-          .toList();
-    } on DioException catch (e) {
-      throw e.asApiException;
+    } catch (e) {
+      throw _handleError(e);
     }
   }
 
   @override
   Future<NominatimPlaceDto?> reverseGeocode(double lat, double lon) async {
     try {
-      final response = await _dio.get(
-        '/reverse',
-        queryParameters: {
-          'lat': lat,
-          'lon': lon,
-          'format': 'json',
-          'addressdetails': 1,
-        },
+      final response = await _api.reverseGeocode(
+        lat,
+        lon,
+        'json',
+        1,
       );
-
-      final data = response.data as Map<String, dynamic>;
-      if (data.containsKey('error')) return null;
-      return NominatimPlaceDto.fromJson(data);
-    } on DioException catch (e) {
-      throw e.asApiException;
+      return response;
+    } catch (e) {
+      throw _handleError(e);
     }
+  }
+
+  ApiException _handleError(dynamic error) {
+    if (error is ApiException) {
+      return error;
+    }
+    return ApiException(
+      message: 'Ошибка сети: $error',
+      originalError: error,
+    );
   }
 }

@@ -156,26 +156,26 @@ void _registerDataSources() {
     () => FavouritesLocalDataSourceImpl(),
   );
 
-  // API Data Sources (Dio)
+  // API Data Sources (Retrofit)
 
   // OpenFDA API
   getIt.registerLazySingleton<OpenFdaApiDataSource>(
-    () => OpenFdaApiDataSourceImpl(dio: getIt(instanceName: 'openFda')),
+    () => OpenFdaApiDataSourceImpl(),
   );
 
   // DaData API
   getIt.registerLazySingleton<DaDataApiDataSource>(
-    () => DaDataApiDataSourceImpl(dio: getIt(instanceName: 'dadata')),
+    () => DaDataApiDataSourceImpl(),
   );
 
   // Nominatim API (OpenStreetMap geocoding)
   getIt.registerLazySingleton<NominatimApiDataSource>(
-    () => NominatimApiDataSourceImpl(dio: getIt(instanceName: 'nominatim')),
+    () => NominatimApiDataSourceImpl(),
   );
 
   // Overpass API (OpenStreetMap pharmacies)
   getIt.registerLazySingleton<OverpassApiDataSource>(
-    () => OverpassApiDataSourceImpl(dio: getIt(instanceName: 'overpass')),
+    () => OverpassApiDataSourceImpl(),
   );
 }
 

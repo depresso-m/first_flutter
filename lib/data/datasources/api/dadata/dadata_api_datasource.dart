@@ -1,32 +1,30 @@
-import 'package:dio/dio.dart';
-
 import '../../../../core/constants/api_constants.dart';
+import '../../../../core/exceptions/api_exception.dart';
 import '../../../../core/network/dio_client.dart';
 import 'dto/dadata_suggestion_dto.dart';
+import 'dadata_retrofit_api.dart';
 
 /// Data source for DaData address suggestions API
 abstract class DaDataApiDataSource {
-  /// Suggest cities
   Future<List<DaDataSuggestionDto>> suggestCities(String query);
 
-  /// Suggest streets
   Future<List<DaDataSuggestionDto>> suggestStreets(String query);
 
-  /// Suggest full address (no restrictions)
   Future<List<DaDataSuggestionDto>> suggestFullAddress(String query);
 
-  /// Suggest addresses within a specific city
-  Future<List<DaDataSuggestionDto>> suggestByCity(String query, String cityFiasId);
+  Future<List<DaDataSuggestionDto>> suggestByCity(
+    String query,
+    String cityFiasId,
+  );
 
-  /// Refine house number
   Future<List<DaDataSuggestionDto>> refineHouse(String streetQuery);
 }
 
 class DaDataApiDataSourceImpl implements DaDataApiDataSource {
-  final Dio _dio;
+  final DaDataRetrofitApi _api;
 
-  DaDataApiDataSourceImpl({Dio? dio})
-      : _dio = dio ?? DioClient.dadata().dio;
+  DaDataApiDataSourceImpl({DaDataRetrofitApi? api})
+      : _api = api ?? DaDataRetrofitApi(DioClient.dadata().dio);
 
   @override
   Future<List<DaDataSuggestionDto>> suggestCities(String query) async {
@@ -80,16 +78,24 @@ class DaDataApiDataSourceImpl implements DaDataApiDataSource {
     });
   }
 
-  Future<List<DaDataSuggestionDto>> _suggest(Map<String, dynamic> body) async {
+  Future<List<DaDataSuggestionDto>> _suggest(
+    Map<String, dynamic> body,
+  ) async {
     try {
-      final response = await _dio.post(
-        ApiConstants.dadataSuggestPath,
-        data: body,
-      );
-
-      return DaDataResponseDto.fromJson(response.data).suggestions;
-    } on DioException catch (e) {
-      throw e.asApiException;
+      final response = await _api.suggest(body);
+      return response.suggestions;
+    } catch (e) {
+      throw _handleError(e);
     }
+  }
+
+  ApiException _handleError(dynamic error) {
+    if (error is ApiException) {
+      return error;
+    }
+    return ApiException(
+      message: 'Ошибка сети: $error',
+      originalError: error,
+    );
   }
 }

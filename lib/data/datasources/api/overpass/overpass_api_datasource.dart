@@ -1,22 +1,19 @@
-import 'package:dio/dio.dart';
-
+import '../../../../core/exceptions/api_exception.dart';
 import '../../../../core/models/geo_point.dart';
 import '../../../../core/network/dio_client.dart';
 import 'dto/overpass_pharmacy_dto.dart';
+import 'overpass_retrofit_api.dart';
 
 /// Data source for Overpass API (OpenStreetMap data queries)
 abstract class OverpassApiDataSource {
-  /// Get pharmacies within a radius of a point
   Future<List<OverpassElementDto>> getPharmaciesInRadius(
     double lat,
     double lon,
     int radiusMeters,
   );
 
-  /// Get pharmacies within a bounding box
   Future<List<OverpassElementDto>> getPharmaciesInBounds(MapBounds bounds);
 
-  /// Get pharmacies with name filter
   Future<List<OverpassElementDto>> getPharmaciesByName(
     MapBounds bounds,
     String nameFilter,
@@ -24,10 +21,10 @@ abstract class OverpassApiDataSource {
 }
 
 class OverpassApiDataSourceImpl implements OverpassApiDataSource {
-  final Dio _dio;
+  final OverpassRetrofitApi _api;
 
-  OverpassApiDataSourceImpl({Dio? dio})
-      : _dio = dio ?? DioClient.overpass().dio;
+  OverpassApiDataSourceImpl({OverpassRetrofitApi? api})
+      : _api = api ?? OverpassRetrofitApi(DioClient.overpass().dio);
 
   @override
   Future<List<OverpassElementDto>> getPharmaciesInRadius(
@@ -83,18 +80,20 @@ out center;
 
   Future<List<OverpassElementDto>> _executeQuery(String query) async {
     try {
-      final response = await _dio.post(
-        '',
-        data: {'data': query},
-        options: Options(
-          contentType: Headers.formUrlEncodedContentType,
-        ),
-      );
-
-      final dto = OverpassResponseDto.fromJson(response.data);
-      return dto.elements;
-    } on DioException catch (e) {
-      throw e.asApiException;
+      final response = await _api.executeQuery(query);
+      return response.elements;
+    } catch (e) {
+      throw _handleError(e);
     }
+  }
+
+  ApiException _handleError(dynamic error) {
+    if (error is ApiException) {
+      return error;
+    }
+    return ApiException(
+      message: 'Ошибка сети: $error',
+      originalError: error,
+    );
   }
 }
