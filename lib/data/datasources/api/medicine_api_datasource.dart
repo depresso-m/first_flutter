@@ -21,7 +21,7 @@ class MedicineApiDataSourceImpl implements MedicineApiDataSource {
       name: 'Ибупрофен',
       price: 150,
       imageUrl:
-          'https://ozerki.ru/_next/image/?url=https%3A%2F%2Fozerki.ru%2Fer-pics%2Fimages%2Fgoods%2F77719%2Fmain&w=768&q=90',
+          'https://images.apteka.ru/original_eff4c8e9-4bee-4fac-89f8-d4ad142c0d24.png',
       description: 'Противовоспалительное средство',
       manufacturer: 'Синтез',
     ),
@@ -30,7 +30,7 @@ class MedicineApiDataSourceImpl implements MedicineApiDataSource {
       name: 'Аспирин',
       price: 90,
       imageUrl:
-          'https://evropharm.ru/Storage/Resized/w_480/aspirin-bajer-0-5-n20.jpg',
+          'https://cdn.eapteka.ru/upload/offer_photo/515/196/resized/230_230_1_e398cec94feead85b168c69c464b2cfb.png?t=1649777511&_cvc=1765262398',
       description: 'Жаропонижающее, обезболивающее',
       manufacturer: 'Bayer',
     ),
@@ -39,7 +39,7 @@ class MedicineApiDataSourceImpl implements MedicineApiDataSource {
       name: 'Азитромицин',
       price: 70,
       imageUrl:
-          'https://evropharm.ru/Storage/azitromicin-500-mg-N3-tabl-verteks.jpg',
+          'https://cdn.stolichki.ru/s/drugs/large/51/51391.jpg',
       description: 'Антибиотик широкого спектра действия',
       manufacturer: 'Вертекс',
     ),
