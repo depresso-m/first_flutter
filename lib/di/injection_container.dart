@@ -1,6 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart' as http;
 
+import '../core/network/dio_client.dart';
 import '../data/datasources/api/dadata/dadata_api_datasource.dart';
 import '../data/datasources/api/medicine_api_datasource.dart';
 import '../data/datasources/api/nominatim/nominatim_api_datasource.dart';
@@ -81,14 +82,30 @@ import '../domain/usecases/theme/save_theme_mode_usecase.dart';
 final getIt = GetIt.instance;
 
 void setupDependencyInjection() {
-  _registerHttpClient();
+  _registerDioClients();
   _registerDataSources();
   _registerRepositories();
   _registerUseCases();
 }
 
-void _registerHttpClient() {
-  getIt.registerLazySingleton<http.Client>(() => http.Client());
+void _registerDioClients() {
+  // Регистрируем Dio клиенты для каждого API
+  getIt.registerLazySingleton<Dio>(
+    () => DioClient.openFda().dio,
+    instanceName: 'openFda',
+  );
+  getIt.registerLazySingleton<Dio>(
+    () => DioClient.dadata().dio,
+    instanceName: 'dadata',
+  );
+  getIt.registerLazySingleton<Dio>(
+    () => DioClient.nominatim().dio,
+    instanceName: 'nominatim',
+  );
+  getIt.registerLazySingleton<Dio>(
+    () => DioClient.overpass().dio,
+    instanceName: 'overpass',
+  );
 }
 
 void _registerDataSources() {
@@ -139,26 +156,26 @@ void _registerDataSources() {
     () => FavouritesLocalDataSourceImpl(),
   );
 
-  // NEW: API Data Sources for external APIs
+  // API Data Sources (Dio)
 
   // OpenFDA API
   getIt.registerLazySingleton<OpenFdaApiDataSource>(
-    () => OpenFdaApiDataSourceImpl(client: getIt()),
+    () => OpenFdaApiDataSourceImpl(dio: getIt(instanceName: 'openFda')),
   );
 
   // DaData API
   getIt.registerLazySingleton<DaDataApiDataSource>(
-    () => DaDataApiDataSourceImpl(client: getIt()),
+    () => DaDataApiDataSourceImpl(dio: getIt(instanceName: 'dadata')),
   );
 
   // Nominatim API (OpenStreetMap geocoding)
   getIt.registerLazySingleton<NominatimApiDataSource>(
-    () => NominatimApiDataSourceImpl(client: getIt()),
+    () => NominatimApiDataSourceImpl(dio: getIt(instanceName: 'nominatim')),
   );
 
   // Overpass API (OpenStreetMap pharmacies)
   getIt.registerLazySingleton<OverpassApiDataSource>(
-    () => OverpassApiDataSourceImpl(client: getIt()),
+    () => OverpassApiDataSourceImpl(dio: getIt(instanceName: 'overpass')),
   );
 }
 
