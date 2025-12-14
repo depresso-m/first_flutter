@@ -5,3 +5,4 @@ export 'loyalty_repository.dart';
 export 'medicine_repository.dart';
 export 'order_repository.dart';
 export 'pharmacy_repository.dart';
+export 'theme_repository.dart';

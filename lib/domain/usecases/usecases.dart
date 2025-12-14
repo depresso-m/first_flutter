@@ -20,3 +20,5 @@ export 'order/create_order_usecase.dart';
 export 'order/get_orders_usecase.dart';
 export 'pharmacy/get_all_pharmacies_usecase.dart';
 export 'pharmacy/get_pharmacy_by_id_usecase.dart';
+export 'theme/get_theme_mode_usecase.dart';
+export 'theme/save_theme_mode_usecase.dart';

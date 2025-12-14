@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/models/app_theme_mode.dart';
 import '../providers/auth_provider.dart';
+import '../providers/theme_provider.dart';
 
 class ProfileSettingsScreen extends ConsumerStatefulWidget {
   const ProfileSettingsScreen({super.key});
@@ -13,6 +15,17 @@ class ProfileSettingsScreen extends ConsumerStatefulWidget {
 
 class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  String _getThemeName(AppThemeMode theme) {
+    switch (theme) {
+      case AppThemeMode.light:
+        return 'Светлая';
+      case AppThemeMode.dark:
+        return 'Тёмная';
+      case AppThemeMode.system:
+        return 'Системная';
+    }
+  }
 
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
@@ -120,6 +133,38 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 controller: _cityController,
                 label: 'Город',
                 textCapitalization: TextCapitalization.words,
+              ),
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 16),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Тема приложения',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Consumer(
+                builder: (context, ref, child) {
+                  final currentTheme = ref.watch(themeNotifierProvider);
+                  return Column(
+                    children: AppThemeMode.values.map((theme) {
+                      return RadioListTile<AppThemeMode>(
+                        title: Text(_getThemeName(theme)),
+                        value: theme,
+                        groupValue: currentTheme,
+                        onChanged: (value) {
+                          if (value != null) {
+                            ref
+                                .read(themeNotifierProvider.notifier)
+                                .setTheme(value);
+                          }
+                        },
+                      );
+                    }).toList(),
+                  );
+                },
               ),
               const SizedBox(height: 24),
               SizedBox(
