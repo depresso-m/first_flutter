@@ -101,6 +101,16 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 12),
                 Card(
                   child: ListTile(
+                    leading: const Icon(Icons.map),
+                    title: const Text('Карта аптек'),
+                    subtitle: const Text('OpenStreetMap'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push(AppRoutes.pharmacyMap),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  child: ListTile(
                     leading: const Icon(Icons.settings),
                     title: const Text('Настройки профиля'),
                     trailing: const Icon(Icons.chevron_right),

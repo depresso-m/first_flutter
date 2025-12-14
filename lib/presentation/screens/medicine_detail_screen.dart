@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/medicine.dart';
 import '../providers/cart_provider.dart';
 import '../providers/favourites_provider.dart';
+import '../providers/medicines_provider.dart';
 import '../widgets/back_button.dart';
 import '../widgets/quantity_controls.dart';
 
@@ -27,6 +28,17 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
     final isFavourite = favourites.contains(widget.medicine);
     final favouritesNotifier = ref.read(favouritesNotifierProvider.notifier);
     final cartNotifier = ref.read(cartNotifierProvider.notifier);
+
+    // Watch API data if NDC is available
+    final detailsAsync = widget.medicine.ndc != null
+        ? ref.watch(medicineDetailsProvider(widget.medicine.ndc!))
+        : null;
+    final sideEffectsAsync = widget.medicine.brandName != null
+        ? ref.watch(sideEffectsProvider(widget.medicine.brandName!))
+        : null;
+    final analogsAsync = widget.medicine.activeIngredient != null
+        ? ref.watch(medicineAnalogsProvider(widget.medicine.activeIngredient!))
+        : null;
 
     return Scaffold(
       appBar: AppBar(
@@ -53,11 +65,22 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.medicine.name,
+                    widget.medicine.displayName,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                   ),
+                  if (widget.medicine.genericName != null &&
+                      widget.medicine.genericName != widget.medicine.brandName)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        widget.medicine.genericName!,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                      ),
+                    ),
                   const SizedBox(height: 8),
                   Text(
                     widget.medicine.priceFormatted,
@@ -66,6 +89,52 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                   ),
+
+                  // Additional info chips
+                  if (widget.medicine.dosageForm != null ||
+                      widget.medicine.route != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          if (widget.medicine.dosageForm != null)
+                            Chip(
+                              avatar: const Icon(Icons.medication, size: 16),
+                              label: Text(widget.medicine.dosageForm!),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          if (widget.medicine.route != null)
+                            Chip(
+                              avatar: const Icon(Icons.directions, size: 16),
+                              label: Text(widget.medicine.route!),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                        ],
+                      ),
+                    ),
+
+                  // Manufacturer
+                  if (widget.medicine.manufacturer != null) ...[
+                    const SizedBox(height: 16),
+                    _InfoRow(
+                      icon: Icons.business,
+                      label: 'Производитель',
+                      value: widget.medicine.manufacturer!,
+                    ),
+                  ],
+
+                  // Active ingredient
+                  if (widget.medicine.activeIngredient != null) ...[
+                    const SizedBox(height: 8),
+                    _InfoRow(
+                      icon: Icons.science,
+                      label: 'Действующее вещество',
+                      value: widget.medicine.activeIngredient!,
+                    ),
+                  ],
+
                   const SizedBox(height: 24),
                   Row(
                     children: [
@@ -87,7 +156,7 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   FilledButton.icon(
                     onPressed: () {
                       for (int i = 0; i < quantity; i++) {
@@ -108,6 +177,50 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                   ),
+
+                  // Details from API
+                  if (detailsAsync != null)
+                    detailsAsync.when(
+                      data: (details) {
+                        if (details == null || !details.hasAnyData) {
+                          return const SizedBox.shrink();
+                        }
+                        return _DetailsSection(details: details);
+                      },
+                      loading: () => const Padding(
+                        padding: EdgeInsets.only(top: 24),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                      error: (_, __) => const SizedBox.shrink(),
+                    ),
+
+                  // Side effects from API
+                  if (sideEffectsAsync != null)
+                    sideEffectsAsync.when(
+                      data: (effects) {
+                        if (effects.isEmpty) return const SizedBox.shrink();
+                        return _SideEffectsSection(effects: effects);
+                      },
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
+                    ),
+
+                  // Analogs from API
+                  if (analogsAsync != null)
+                    analogsAsync.when(
+                      data: (analogs) {
+                        if (analogs.isEmpty) return const SizedBox.shrink();
+                        // Filter out current medicine
+                        final filtered = analogs
+                            .where((m) => m.id != widget.medicine.id)
+                            .take(5)
+                            .toList();
+                        if (filtered.isEmpty) return const SizedBox.shrink();
+                        return _AnalogsSection(analogs: filtered);
+                      },
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
+                    ),
                 ],
               ),
             ),
@@ -165,5 +278,265 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
     } else {
       return 'товаров';
     }
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: Theme.of(context).colorScheme.outline),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+              ),
+              Text(value, style: Theme.of(context).textTheme.bodyMedium),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DetailsSection extends StatelessWidget {
+  final dynamic details;
+
+  const _DetailsSection({required this.details});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 24),
+        Text(
+          'Информация из OpenFDA',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        const SizedBox(height: 12),
+        if (details.description != null)
+          _ExpandableText(title: 'Описание', text: details.description!),
+        if (details.indications != null)
+          _ExpandableText(title: 'Показания', text: details.indications!),
+        if (details.dosageAndAdministration != null)
+          _ExpandableText(
+            title: 'Дозировка и применение',
+            text: details.dosageAndAdministration!,
+          ),
+        if (details.warnings != null)
+          _ExpandableText(
+            title: 'Предупреждения',
+            text: details.warnings!,
+            isWarning: true,
+          ),
+        if (details.contraindications != null)
+          _ExpandableText(
+            title: 'Противопоказания',
+            text: details.contraindications!,
+            isWarning: true,
+          ),
+      ],
+    );
+  }
+}
+
+class _ExpandableText extends StatefulWidget {
+  final String title;
+  final String text;
+  final bool isWarning;
+
+  const _ExpandableText({
+    required this.title,
+    required this.text,
+    this.isWarning = false,
+  });
+
+  @override
+  State<_ExpandableText> createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<_ExpandableText> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      color: widget.isWarning
+          ? theme.colorScheme.errorContainer.withOpacity(0.3)
+          : null,
+      child: InkWell(
+        onTap: () => setState(() => _isExpanded = !_isExpanded),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (widget.isWarning)
+                    Icon(
+                      Icons.warning_amber,
+                      size: 18,
+                      color: theme.colorScheme.error,
+                    ),
+                  if (widget.isWarning) const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color:
+                            widget.isWarning ? theme.colorScheme.error : null,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: theme.colorScheme.outline,
+                  ),
+                ],
+              ),
+              if (_isExpanded) ...[
+                const SizedBox(height: 8),
+                Text(
+                  widget.text,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SideEffectsSection extends StatelessWidget {
+  final List<String> effects;
+
+  const _SideEffectsSection({required this.effects});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 24),
+        Row(
+          children: [
+            Icon(
+              Icons.warning_amber,
+              color: Theme.of(context).colorScheme.error,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Возможные побочные эффекты',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'По данным FDA (на англ.):',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: effects.take(10).map((effect) {
+            return Chip(
+              label: Text(
+                effect,
+                style: const TextStyle(fontSize: 12),
+              ),
+              visualDensity: VisualDensity.compact,
+              backgroundColor:
+                  Theme.of(context).colorScheme.errorContainer.withOpacity(0.3),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _AnalogsSection extends StatelessWidget {
+  final List<Medicine> analogs;
+
+  const _AnalogsSection({required this.analogs});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 24),
+        Text(
+          'Аналоги (по действующему веществу)',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        const SizedBox(height: 12),
+        ...analogs.map((medicine) {
+          return Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: ListTile(
+              dense: true,
+              leading: const Icon(Icons.medication),
+              title: Text(
+                medicine.displayName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                medicine.manufacturer ?? '',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: Text(
+                medicine.priceFormatted,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          );
+        }),
+      ],
+    );
   }
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/models/address_suggestion.dart';
 import '../../core/models/app_theme_mode.dart';
 import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
+import '../widgets/address_autocomplete_field.dart';
 
 class ProfileSettingsScreen extends ConsumerStatefulWidget {
   const ProfileSettingsScreen({super.key});
@@ -33,7 +35,10 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   late final TextEditingController _phoneController;
   late final TextEditingController _cityController;
 
+  // ignore: unused_field
+  AddressSuggestion? _selectedCity;
   bool _isSaving = false;
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -56,20 +61,19 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   }
 
   void _syncControllers() {
-    final account = ref.watch(currentUserProvider);
+    // Only sync once on first build
+    if (_isInitialized) return;
+    
+    final account = ref.read(currentUserProvider);
     if (account == null) return;
 
-    void sync(TextEditingController controller, String value) {
-      if (controller.text != value) {
-        controller.text = value;
-      }
-    }
-
-    sync(_firstNameController, account.firstName ?? '');
-    sync(_lastNameController, account.lastName ?? '');
-    sync(_emailController, account.email);
-    sync(_phoneController, account.phone ?? '');
-    sync(_cityController, account.city ?? '');
+    _firstNameController.text = account.firstName ?? '';
+    _lastNameController.text = account.lastName ?? '';
+    _emailController.text = account.email;
+    _phoneController.text = account.phone ?? '';
+    _cityController.text = account.city ?? '';
+    
+    _isInitialized = true;
   }
 
   Future<void> _saveProfile() async {
@@ -129,10 +133,20 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 16),
-              _ProfileField(
-                controller: _cityController,
+              AddressAutocompleteField(
                 label: 'Город',
-                textCapitalization: TextCapitalization.words,
+                hintText: 'Начните вводить название города...',
+                type: AddressSuggestionType.city,
+                controller: _cityController,
+                initialValue: _cityController.text,
+                onSelected: (suggestion) {
+                  setState(() {
+                    _selectedCity = suggestion;
+                    _cityController.text = suggestion.data.city ?? 
+                                          suggestion.data.cityWithType ?? 
+                                          suggestion.value;
+                  });
+                },
               ),
               const SizedBox(height: 24),
               const Divider(),

@@ -8,6 +8,7 @@ import '../../core/models/loyalty_state.dart';
 import '../providers/cart_provider.dart';
 import '../providers/loyalty_provider.dart';
 import '../providers/orders_provider.dart';
+import '../widgets/address_autocomplete_field.dart';
 import '../widgets/back_button.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -146,15 +147,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               },
             ),
             const SizedBox(height: 16),
-            TextFormField(
+            AddressAutocompleteField(
+              label: 'Адрес доставки',
+              hintText: 'Начните вводить адрес...',
+              type: AddressSuggestionType.fullAddress,
               controller: _addressController,
-              decoration: const InputDecoration(
-                labelText: 'Адрес (до квартиры)',
-                hintText: 'г. Москва, ул. Ленина, д. 10',
-                border: OutlineInputBorder(),
-              ),
-              textCapitalization: TextCapitalization.sentences,
-              maxLines: 2,
+              onSelected: (suggestion) {
+                _addressController.text = suggestion.value;
+              },
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return 'Введите адрес';

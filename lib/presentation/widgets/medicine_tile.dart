@@ -28,10 +28,41 @@ class MedicineTile extends ConsumerWidget {
               const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           leading: _buildImage(),
           title: Text(
-            medicine.name,
+            medicine.displayName,
             style: Theme.of(context).textTheme.titleMedium,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          subtitle: Text(medicine.priceFormatted),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (medicine.subtitle != null)
+                Text(
+                  medicine.subtitle!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              Text(
+                medicine.priceFormatted,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              if (medicine.manufacturer != null)
+                Text(
+                  medicine.manufacturer!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+            ],
+          ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

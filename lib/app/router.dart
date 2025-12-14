@@ -17,6 +17,7 @@ import '../presentation/screens/order_success_screen.dart';
 import '../presentation/screens/orders_screen.dart';
 import '../presentation/screens/pharmacies_screen.dart';
 import '../presentation/screens/pharmacy_detail_screen.dart';
+import '../presentation/screens/pharmacy_map_screen.dart';
 import '../presentation/screens/profile_screen.dart';
 import '../presentation/screens/profile_settings_screen.dart';
 import '../presentation/screens/register_screen.dart';
@@ -42,6 +43,7 @@ abstract class AppRoutes {
   static const favourites = '/profile/favourites';
   static const pharmacies = '/profile/pharmacies';
   static const pharmacyDetail = '/profile/pharmacies/detail';
+  static const pharmacyMap = '/profile/pharmacies/map';
   static const loyalty = '/profile/loyalty';
   static const profileSettings = '/profile/settings';
 
@@ -166,6 +168,11 @@ GoRouter router(Ref ref) {
                       final pharmacy = state.extra as Pharmacy;
                       return PharmacyDetailScreen(pharmacy: pharmacy);
                     },
+                  ),
+                  GoRoute(
+                    path: 'map',
+                    name: 'pharmacyMap',
+                    builder: (context, state) => const PharmacyMapScreen(),
                   ),
                 ],
               ),

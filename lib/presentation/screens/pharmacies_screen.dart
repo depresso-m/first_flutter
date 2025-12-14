@@ -18,6 +18,13 @@ class PharmaciesScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Аптеки'),
         leading: const CustomBackButton(),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.map),
+            tooltip: 'Показать на карте',
+            onPressed: () => context.push(AppRoutes.pharmacyMap),
+          ),
+        ],
       ),
       body: pharmaciesAsync.when(
         data: (pharmacies) => ListView.separated(
